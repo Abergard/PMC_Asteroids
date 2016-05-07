@@ -41,13 +41,34 @@ file = main
 build $builddir/$file.o: clang_compile $location/$file.cpp
 build $builddir/$file.plist: clang_analyze $location/$file.cpp
 
+file = Vehicle
+build $builddir/$file.o: clang_compile $location/$file.cpp
+build $builddir/$file.plist: clang_analyze $location/$file.cpp
+
+file = Asteroid
+build $builddir/$file.o: clang_compile $location/$file.cpp
+build $builddir/$file.plist: clang_analyze $location/$file.cpp
+
+file = Ship
+build $builddir/$file.o: clang_compile $location/$file.cpp
+build $builddir/$file.plist: clang_analyze $location/$file.cpp
+
 #--------------------------------------------------------------
 
-build compile: phony | $builddir/main.o
+build compile: phony | $builddir/main.o $
+                       $builddir/Vehicle.o $
+                       $builddir/Asteroid.o $
+                       $builddir/Ship.o
 
-build $exe: clang_link $builddir/main.o
+build $exe: clang_link $builddir/main.o $
+                       $builddir/Vehicle.o $
+                       $builddir/Asteroid.o $
+                       $builddir/Ship.o
 
-build analyze: phony | $builddir/main.plist
+build analyze: phony | $builddir/main.plist $
+                       $builddir/Vehicle.plist $
+                       $builddir/Asteroid.plist $
+                       $builddir/Ship.plist
 
 build syntax: clang_syntax
 

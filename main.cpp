@@ -7,6 +7,11 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "Vehicle.hpp"
+GLfloat Vehicle::vector = 0;
+#include "Ship.hpp"
+#include "Asteroid.hpp"
+
 // declaration / globals
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 WNDCLASSEX wc;
@@ -31,201 +36,14 @@ struct ROZMIAR {
   int y;
 } OKNO = {800, 600};
 
-class VEHICLE {
-public:
-  GLfloat posX;
-  GLfloat posY;
-  static GLfloat vector;
-  GLfloat angle;
-};
-
-GLfloat VEHICLE::vector = 0;
-
-class ASTEROID : public VEHICLE {
-public:
-  GLfloat my_vector;
-  GLfloat rotation;
-  bool IsExist;
-
-  ASTEROID() {
-    IsExist = false;
-    this->rotation = 0;
-    this->posX = 0;
-    this->posY = 0;
-    this->angle = 0;
-    this->my_vector = vector;
-    RandPosition();
-  }
-
-  void RandPosition(void) {
-    int site = rand() % 2800;
-
-    if (site < 800) {
-      this->posX = site - 400;
-      this->posY = 300 + 50;
-      this->angle = rand() % 180 + 180;
-    } else if (site < 1400) {
-      this->posX = 400 + 50;
-      this->posY = site - 1100;
-      this->angle = rand() % 180 + 90;
-    } else if (site < 2200) {
-      this->posX = site - 1800;
-      this->posY = -300 - 50;
-      this->angle = rand() % 180;
-    } else {
-      this->posX = -400 - 50;
-      this->posY = site - 2500;
-      this->angle = rand() % 180 - 90;
-    }
-
-    int speed = rand() % 3 + 1;
-
-    this->my_vector = vector * speed;
-  }
-
-  void Draw(void) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glPushMatrix();
-
-    // only for change
-    glTranslatef(posX, posY, 0);
-    glRotatef(rotation, 0, 0, 1);
-    //
-
-    glBegin(GL_POLYGON);
-
-    glVertex2f(+50.0f, -10.0f);
-    glVertex2f(+20.0f, -50.0f);
-    glVertex2f(-5.0f, -50.0f);
-    glVertex2f(-5.0f, -25.0f);
-    glVertex2f(-30.0f, -50.0f);
-    glVertex2f(-50.0f, -10.0f);
-    glVertex2f(-25.0f, 0.0f);
-    glVertex2f(-50.0f, +10.0f);
-    glVertex2f(-15.0f, +45.0f);
-    glVertex2f(+20.0f, +45.0f);
-
-    glEnd();
-
-    glBegin(GL_POINTS);
-    glVertex2f(0.0f, 0.0f);
-    glEnd();
-    glPopMatrix();
-  }
-
-  bool Update(void) {
-
-    this->posX += cos(angle * M_PI / 180.0f) * my_vector;
-    this->posY += sin(angle * M_PI / 180.0f) * my_vector;
-
-    if (this->posX > 400 + 50 || this->posX < -400 - 50)
-      return false;
-
-    if (this->posY > 300 + 50 || this->posY < -300 - 50)
-      return false;
-
-    rotation += 1;
-
-    if (rotation > 360.0f)
-      rotation -= 360.0f;
-
-    return true;
-  }
-};
-
-class SHIP_CLASS : public VEHICLE {
-public:
-  bool IsDestroy;
-  int destroyCount;
-  GLfloat color;
-
-  int slower;
-
-  SHIP_CLASS(void) {
-    this->slower = 0;
-    this->angle = 0;
-    this->vector = 2;
-    this->posX = 0;
-    this->posY = 0;
-    this->destroyCount = 0;
-    this->IsDestroy = false;
-    this->color = 1.0f;
-  }
-
-  void Destroy(void) {
-    if (slower == 5) {
-      this->IsDestroy = true;
-      if (this->color > 0)
-        this->color -= 0.2f;
-
-      this->destroyCount = (this->destroyCount + 1) % 6;
-
-      if (this->destroyCount == 0) {
-        this->IsDestroy = false;
-        this->angle = 0;
-        this->posX = 0;
-        this->posY = 0;
-        this->destroyCount = 0;
-        this->color = 1.0f;
-      }
-    }
-    slower = (slower + 1) % 6;
-  }
-
-  void Update(bool ShiftBackMode) {
-    if (IsDestroy == false) {
-      GLfloat MODE = 1.0f;
-
-      if (ShiftBackMode)
-        MODE = -1.0f;
-
-      this->posX += MODE * cos(angle * M_PI / 180.0f) * vector;
-      this->posY += MODE * sin(angle * M_PI / 180.0f) * vector;
-
-      if (this->posX > 400 || this->posX < -400)
-        this->posX *= -1;
-
-      if (this->posY > 300 || this->posY < -300)
-        this->posY *= -1;
-    }
-  }
-
-  void Draw(void) {
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glPushMatrix();
-
-    // only for change
-    glTranslatef(posX, posY, 0);
-    glRotatef(angle, 0, 0, 1);
-    //
-
-    glBegin(GL_POLYGON);
-    glColor3f(this->color, this->color, this->color);
-    glVertex2f(+15.0f, 0.0f);
-    glVertex2f(-15.0f, -10.0f);
-    glVertex2f(-5.0f, 0.0f);
-    glVertex2f(-15.0f, +10.0f);
-    glEnd();
-
-    glBegin(GL_POINTS);
-    glVertex2f(0.0f, 0.0f);
-    glEnd();
-
-    glPopMatrix();
-  }
-};
-
 LPSTR NazwaKlasy = "GL tutorial";
 MSG msg;
 HWND g_hWnd;
 HDC hDC;
 HGLRC hRC;
 BOOL quit = FALSE;
-SHIP_CLASS racket;
-ASTEROID asteroid;
+Ship racket;
+Asteroid asteroid;
 int racket_spedd = 0;
 
 const WORD ID_TIMER = 1;
