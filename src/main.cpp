@@ -72,7 +72,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrievInstance,
   // WS_OVERLAPPEDWINDOW WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX / WS_CAPTION |
   // WS_POPUPWINDOW
   HWND hWnd = CreateWindowEx(
-      WS_EX_CLIENTEDGE, NazwaKlasy, "Zad 2 - Lukasz Zawistowicz",
+      WS_EX_CLIENTEDGE, NazwaKlasy, "Zad 2",
       WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, OKNO.x,
       OKNO.y, NULL, NULL, hInstance, NULL);
 
