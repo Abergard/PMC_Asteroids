@@ -1,5 +1,6 @@
 # PMC_Asteroids 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![ready](https://img.shields.io/badge/ready-1%25-lightgrey.svg)](https://github.com/Abergard/PMC_Asteroids/tree/pmc)
 
 Pimp my code - Asteroids old school project
 
