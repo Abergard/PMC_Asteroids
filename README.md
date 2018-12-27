@@ -10,3 +10,11 @@ All PMC_ projects was founded to take old school project and refactor them to ac
 ## Branches:
  - master: for base version of project
  - pmc: for ongoing works to make a code be cleaner & better
+
+## How to build
+For now it supports only MSVC compilation. Example below
+```
+mkdir build
+cd build
+cmake -G "Visual Studio 15 2017 Win64" ..
+```
