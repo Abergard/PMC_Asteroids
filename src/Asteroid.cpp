@@ -1,5 +1,11 @@
 #include "Asteroid.hpp"
 
+#include <windows.h>
+#include <gl/GLU.h>
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 Asteroid::Asteroid()
 {
     IsExist = false;

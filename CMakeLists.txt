@@ -31,7 +31,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 
 add_executable(asteroids
   src/main.cpp
-  src/Vehicle.cpp
   src/Asteroid.cpp
   src/Ship.cpp
   )

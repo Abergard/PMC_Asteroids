@@ -1,16 +1,12 @@
 #pragma once
-#include <windows.h>
-
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #include "Vehicle.hpp"
 
 class Asteroid : public Vehicle
 {
 public:
-    GLfloat my_vector;
-    GLfloat rotation;
+    float my_vector;
+    float rotation;
     bool IsExist;
 
     Asteroid();

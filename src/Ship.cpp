@@ -1,5 +1,11 @@
 #include "Ship.hpp"
 
+#include <windows.h>
+#include <gl/GLU.h>
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 Ship::Ship()
 {
     this->slower = 0;

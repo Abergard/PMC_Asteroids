@@ -1,12 +1,9 @@
 #pragma once
-#include <windows.h>
-#include <gl/GLU.h>
 
-class Vehicle
+struct Vehicle
 {
-public:
-    GLfloat posX;
-    GLfloat posY;
-    static GLfloat vector;
-    GLfloat angle;
+    float posX;
+    float posY;
+    static float vector;
+    float angle;
 };
