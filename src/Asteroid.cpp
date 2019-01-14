@@ -1,7 +1,7 @@
 #include "Asteroid.hpp"
 
-#include <gl/GLU.h>
 #include <windows.h>
+#include <gl/GLU.h>
 
 #define _USE_MATH_DEFINES
 #include <cmath>

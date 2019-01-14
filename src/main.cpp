@@ -1,11 +1,16 @@
 #include <windows.h>
+
 //#include <gl/gl.h>
 #include <gl\GLU.h>
 #include <stdlib.h>
 #include <time.h>
 
+
+
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <exception>
+#include <iostream>
 
 #include "Vehicle.hpp"
 
@@ -46,17 +51,14 @@ MSG msg;
 HWND g_hWnd;
 HDC hDC;
 HGLRC hRC;
-BOOL quit = FALSE;
+
 Ship racket{};
 Asteroid asteroid{};
 int racket_spedd = 0;
 
 const WORD ID_TIMER = 1;
 
-int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrievInstance,
-                   LPSTR lpCmdLine,
-                   int nCmdShow)
+HWND create_window(HINSTANCE hInstance)
 {
     WNDCLASSEX wc;
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -74,16 +76,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     if (!RegisterClassEx(&wc))
     {
-        MessageBox(NULL,
-                   "Rejestracja okna nie powiodla sie!",
-                   "Register Error",
-                   MB_OK | MB_ICONEXCLAMATION);
-        return 1;
+        throw std::exception("Window registration failed");
     }
 
-    // WS_OVERLAPPEDWINDOW WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX /
-    // WS_CAPTION | WS_POPUPWINDOW
-    HWND hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+    auto hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
                                NazwaKlasy,
                                "Zad 2",
                                WS_OVERLAPPEDWINDOW | WS_VISIBLE,
@@ -98,33 +94,41 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     if (hWnd == NULL)
     {
-        MessageBox(NULL,
-                   "Proba utworzenia okna nie powiodla sie!",
-                   "Create Error",
-                   MB_ICONEXCLAMATION);
-        return 1;
+        throw std::exception{"Window creation failed"};
     }
+
+    return hWnd;
+}
+
+int WINAPI WinMain(HINSTANCE hInstance,
+                   HINSTANCE hPrievInstance,
+                   LPSTR lpCmdLine,
+                   int nCmdShow) try
+{
+    auto hWnd = create_window(hInstance);
+    // WS_OVERLAPPEDWINDOW WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX /
+    // WS_CAPTION | WS_POPUPWINDOW
 
     // timer
     if (SetTimer(hWnd, ID_TIMER, 20, NULL) == 0)
-        MessageBox(hWnd, "Nie mozna utworzyc timera!", "Blad", MB_ICONSTOP);
+        MessageBox(hWnd, "Can not create timer", "Blad", MB_ICONSTOP);
 
     // enable OpenGL for the window
     EnableOpenGL(hWnd, &hDC, &hRC);
 
-    // program main loop
-    while (!quit)
+    bool app_running = true;
+    while (app_running)
     {
         // check for messages
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            // handle or dispatch messages
-            if (msg.message == WM_QUIT)
+            switch (msg.message)
             {
-                quit = TRUE;
-            }
-            else
-            {
+            case WM_QUIT:
+                app_running = false;
+                break;
+
+            default:
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
@@ -134,11 +138,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
             Display();
         }
     }
-    // shutdown OpenGL
+
     DisableOpenGL(hWnd, hDC, hRC);
-    // destroy the window explicitly
     DestroyWindow(hWnd);
     return msg.wParam;
+}
+catch (const std::exception& ex)
+{
+    MessageBox(NULL, ex.what(), "Create Error", MB_ICONEXCLAMATION);
+}
+catch (...)
+{
+    MessageBox(
+        NULL, "Unexpected exception", "Create Error", MB_ICONEXCLAMATION);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
