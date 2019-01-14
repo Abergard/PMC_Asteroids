@@ -2,12 +2,11 @@
 
 #include <gl\GLU.h>
 #include <stdlib.h>
-#include <time.h>
 
-#define _USE_MATH_DEFINES
+#include <ctime>
 #include <exception>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include "Vehicle.hpp"
 
