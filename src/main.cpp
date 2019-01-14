@@ -1,16 +1,13 @@
 #include <windows.h>
 
-//#include <gl/gl.h>
 #include <gl\GLU.h>
 #include <stdlib.h>
 #include <time.h>
 
-
-
 #define _USE_MATH_DEFINES
-#include <math.h>
 #include <exception>
 #include <iostream>
+#include <math.h>
 
 #include "Vehicle.hpp"
 
@@ -23,9 +20,8 @@ LRESULT CALLBACK WndProc(HWND hWnd,
                          WPARAM wParam,
                          LPARAM lParam);
 
-void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC);
-void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
-void Display();
+class Window;
+void display();
 
 bool ShiftBackMode = false;
 int TimeCount = 0;
@@ -58,46 +54,149 @@ int racket_spedd = 0;
 
 const WORD ID_TIMER = 1;
 
-HWND create_window(HINSTANCE hInstance)
+class Window
 {
-    WNDCLASSEX wc;
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.style = CS_OWNDC;
-    wc.lpfnWndProc = WndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszMenuName = NULL;
-    wc.lpszClassName = NazwaKlasy;
-    wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
-    if (!RegisterClassEx(&wc))
+public:
+    Window(HINSTANCE hInstance) : hWnd{create_window(hInstance)}
     {
-        throw std::exception("Window registration failed");
     }
 
-    auto hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
-                               NazwaKlasy,
-                               "Zad 2",
-                               WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                               CW_USEDEFAULT,
-                               CW_USEDEFAULT,
-                               OKNO.x,
-                               OKNO.y,
-                               NULL,
-                               NULL,
-                               hInstance,
-                               NULL);
-
-    if (hWnd == NULL)
+    ~Window()
     {
-        throw std::exception{"Window creation failed"};
+        destroy_window();
     }
 
-    return hWnd;
+    HWND handle()
+    {
+        return hWnd;
+    }
+
+    void swap_buffers()
+    {
+        SwapBuffers(hDC);
+    }
+
+private:
+    HWND create_window(HINSTANCE hInstance)
+    {
+        WNDCLASSEX wc;
+        wc.cbSize = sizeof(WNDCLASSEX);
+        wc.style = CS_OWNDC;
+        wc.lpfnWndProc = WndProc;
+        wc.cbClsExtra = 0;
+        wc.cbWndExtra = 0;
+        wc.hInstance = hInstance;
+        wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+        wc.lpszMenuName = NULL;
+        wc.lpszClassName = NazwaKlasy;
+        wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
+        if (!RegisterClassEx(&wc))
+        {
+            throw std::exception("Window registration failed");
+        }
+
+        auto hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+                                   NazwaKlasy,
+                                   "Zad 2",
+                                   WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                                   CW_USEDEFAULT,
+                                   CW_USEDEFAULT,
+                                   OKNO.x,
+                                   OKNO.y,
+                                   NULL,
+                                   NULL,
+                                   hInstance,
+                                   NULL);
+
+        if (hWnd == NULL)
+        {
+            throw std::exception{"Window creation failed"};
+        }
+
+        enable_opengl(hWnd, &hDC, &hRC);
+        return hWnd;
+    }
+
+    void destroy_window()
+    {
+        if (hWnd)
+        {
+            disable_opengl(hWnd, hDC, hRC);
+            DestroyWindow(hWnd);
+        }
+    }
+    void enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC)
+    {
+        PIXELFORMATDESCRIPTOR pfd;
+        int format;
+
+        // get the device context (DC)
+        *hDC = GetDC(hWnd);
+
+        // set the pixel format for the DC
+        ZeroMemory(&pfd, sizeof(pfd));
+
+        pfd.nSize = sizeof(pfd);
+        pfd.nVersion = 1;
+        pfd.dwFlags =
+            PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+        pfd.iPixelType = PFD_TYPE_RGBA;
+        pfd.cColorBits = 24;
+        pfd.cDepthBits = 16;
+        pfd.iLayerType = PFD_MAIN_PLANE;
+
+        format = ChoosePixelFormat(*hDC, &pfd);
+        SetPixelFormat(*hDC, format, &pfd);
+
+        // create and enable the render context (RC)
+        *hRC = wglCreateContext(*hDC);
+        wglMakeCurrent(*hDC, *hRC);
+
+        glPointSize(2.0f);
+    }
+
+    void disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC)
+    {
+        wglMakeCurrent(NULL, NULL);
+        wglDeleteContext(hRC);
+        ReleaseDC(hWnd, hDC);
+    }
+
+    HWND hWnd;
+};
+
+void update()
+{
+    if (racket.is_destroyed)
+    {
+        racket.Destroy();
+    }
+    else
+    {
+        Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
+        racket.Update(ShiftBackMode);
+    }
+
+    if (IsAsteroid)
+    {
+        IsAsteroid = asteroid.Update();
+    }
+    else
+    {
+        if (asteroidBuffer >= 100)
+        {
+            asteroidBuffer = 0;
+            asteroid.RandPosition();
+            IsAsteroid = true;
+        }
+        else
+        {
+            ++asteroidBuffer;
+        }
+    }
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -105,21 +204,18 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    LPSTR lpCmdLine,
                    int nCmdShow) try
 {
-    auto hWnd = create_window(hInstance);
-    // WS_OVERLAPPEDWINDOW WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX /
-    // WS_CAPTION | WS_POPUPWINDOW
+    Window window{hInstance};
 
-    // timer
-    if (SetTimer(hWnd, ID_TIMER, 20, NULL) == 0)
-        MessageBox(hWnd, "Can not create timer", "Blad", MB_ICONSTOP);
+    // TODO: replace TIMER by DeltaTime
+    if (SetTimer(window.handle(), ID_TIMER, 20, NULL) == 0)
+        MessageBox(
+            window.handle(), "Can not create timer", "Blad", MB_ICONSTOP);
 
-    // enable OpenGL for the window
-    EnableOpenGL(hWnd, &hDC, &hRC);
+    srand(time(NULL));
 
     bool app_running = true;
     while (app_running)
     {
-        // check for messages
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             switch (msg.message)
@@ -135,12 +231,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
         }
         else
         {
-            Display();
+            display();
+            window.swap_buffers();
+            // update();
         }
     }
 
-    DisableOpenGL(hWnd, hDC, hRC);
-    DestroyWindow(hWnd);
     return msg.wParam;
 }
 catch (const std::exception& ex)
@@ -157,8 +253,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-
-    case WM_CLOSE:
+    case WM_CLOSE: // TODO: what to do with it? Is it safe to destroy it in
+                   // that way?
         DestroyWindow(hWnd);
         return 0;
 
@@ -211,44 +307,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
 
     case WM_TIMER:
-    {
-        if (racket.is_destroyed == false)
-        {
-            Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
-
-            if (ShiftBackMode == false) // && ( TimeCount % 2 == 0)
-            {
-                racket.Update(ShiftBackMode);
-                //++TEST1;
-            }
-
-            if (ShiftBackMode == true) // && ( TimeCount % 4 == 0)
-            {
-                racket.Update(ShiftBackMode);
-                // TimeCount = 0;
-                //++TEST2;
-            }
-            //++TimeCount;
-        }
-        else
-            racket.Destroy();
-
-        if (IsAsteroid == false)
-        {
-            if (asteroidBuffer >= 100)
-            {
-                asteroidBuffer = 0;
-                asteroid.RandPosition();
-                IsAsteroid = true;
-            }
-            else
-                ++asteroidBuffer;
-        }
-        else // IsAsteroid == true
-        {
-            IsAsteroid = asteroid.Update();
-        }
-    }
+        update();
         return 0;
 
     default:
@@ -256,46 +315,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
 }
 
-// Enable OpenGL
-void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC)
-{
-    PIXELFORMATDESCRIPTOR pfd;
-    int format;
-
-    // get the device context (DC)
-    *hDC = GetDC(hWnd);
-
-    // set the pixel format for the DC
-    ZeroMemory(&pfd, sizeof(pfd));
-
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 16;
-    pfd.iLayerType = PFD_MAIN_PLANE;
-
-    format = ChoosePixelFormat(*hDC, &pfd);
-    SetPixelFormat(*hDC, format, &pfd);
-
-    // create and enable the render context (RC)
-    *hRC = wglCreateContext(*hDC);
-    wglMakeCurrent(*hDC, *hRC);
-
-    glPointSize(2.0f);
-    srand(time(NULL));
-}
-
-// Disable OpenGL
-void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
-{
-    wglMakeCurrent(NULL, NULL);
-    wglDeleteContext(hRC);
-    ReleaseDC(hWnd, hDC);
-}
-
-void Display()
+void display()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -311,9 +331,9 @@ void Display()
     racket.Draw();
 
     if (IsAsteroid == true)
+    {
         asteroid.Draw();
-
-    SwapBuffers(hDC);
+    }
 }
 
 void Collision(GLfloat first_x,
