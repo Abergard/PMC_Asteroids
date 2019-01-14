@@ -14,7 +14,7 @@ constexpr int ship_life{6};
 Ship::Ship()
 {
     angle = 0;
-    vector = 2;
+    base_speed = 2;
     posX = 0;
     posY = 0;
 }
@@ -49,17 +49,24 @@ void Ship::Update(bool ShiftBackMode)
         GLfloat MODE = 1.0f;
 
         if (ShiftBackMode)
+        {
             MODE = -1.0f;
+            base_speed = 1;
+        }
+        else
+        {
+            base_speed = 2;
+        }
 
-        posX += MODE * cos(angle * M_PI / 180.0f) * vector;
-        posY += MODE * sin(angle * M_PI / 180.0f) * vector;
+        posX += MODE * cos(angle * M_PI / 180.0f) * base_speed;
+        posY += MODE * sin(angle * M_PI / 180.0f) * base_speed;
 
         if (posX > 400 || posX < -400)
             posX *= -1;
 
         if (posY > 300 || posY < -300)
             posY *= -1;
-    }
+        }
 }
 
 void Ship::Draw()

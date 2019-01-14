@@ -13,7 +13,8 @@ Asteroid::Asteroid()
     this->posX = 0;
     this->posY = 0;
     this->angle = 0;
-    this->my_vector = vector;
+    this->my_vector = 1;
+    base_speed = 1;
     RandPosition();
 }
 
@@ -46,9 +47,9 @@ void Asteroid::RandPosition(void)
         this->angle = rand() % 180 - 90;
     }
 
-    int speed = rand() % 3 + 1;
+    int speed = base_speed * (rand() % 3 + 1);
 
-    this->my_vector = vector * speed;
+    this->my_vector = speed;
 }
 
 void Asteroid::Draw()

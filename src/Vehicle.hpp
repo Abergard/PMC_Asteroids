@@ -5,5 +5,5 @@ struct Vehicle
     float posX;
     float posY;
     float angle;
-    static int vector;
+    int base_speed;
 };

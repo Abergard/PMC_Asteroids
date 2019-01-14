@@ -8,7 +8,6 @@
 #include <math.h>
 
 #include "Vehicle.hpp"
-int Vehicle::vector = 0;
 
 #include "Ship.hpp"
 #include "Asteroid.hpp"
@@ -172,14 +171,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
       if (ShiftBackMode == false) // && ( TimeCount % 2 == 0)
       {
-        racket.vector = 2;
         racket.Update(ShiftBackMode);
         //++TEST1;
       }
 
       if (ShiftBackMode == true) // && ( TimeCount % 4 == 0)
       {
-        racket.vector = 1;
         racket.Update(ShiftBackMode);
         // TimeCount = 0;
         //++TEST2;
