@@ -8,7 +8,8 @@
 #include <math.h>
 
 #include "Vehicle.hpp"
-GLfloat Vehicle::vector = 0;
+int Vehicle::vector = 0;
+
 #include "Ship.hpp"
 #include "Asteroid.hpp"
 
@@ -42,8 +43,8 @@ HWND g_hWnd;
 HDC hDC;
 HGLRC hRC;
 BOOL quit = FALSE;
-Ship racket;
-Asteroid asteroid;
+Ship racket{};
+Asteroid asteroid{};
 int racket_spedd = 0;
 
 const WORD ID_TIMER = 1;
@@ -159,14 +160,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case VK_TAB:
-      racket.IsDestroy = true;
+      racket.is_destroyed = true;
       break;
     }
   }
     return 0;
 
   case WM_TIMER: {
-    if (racket.IsDestroy == false) {
+    if (racket.is_destroyed == false) {
       Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
 
       if (ShiftBackMode == false) // && ( TimeCount % 2 == 0)
@@ -277,5 +278,5 @@ void Collision(GLfloat first_x, GLfloat first_y, GLfloat second_x,
   float distance = sqrt((tmp_x * tmp_x) + (tmp_y * tmp_y));
 
   if (distance < 54.0f)
-    racket.IsDestroy = true;
+    racket.is_destroyed = true;
 }

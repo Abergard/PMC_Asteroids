@@ -4,6 +4,6 @@ struct Vehicle
 {
     float posX;
     float posY;
-    static float vector;
     float angle;
+    static int vector;
 };

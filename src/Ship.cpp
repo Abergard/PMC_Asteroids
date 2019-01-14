@@ -6,36 +6,37 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+namespace
+{
+constexpr int ship_life{6};
+}
+
 Ship::Ship()
 {
-    this->slower = 0;
-    this->angle = 0;
-    this->vector = 2;
-    this->posX = 0;
-    this->posY = 0;
-    this->destroyCount = 0;
-    this->IsDestroy = false;
-    this->color = 1.0f;
+    angle = 0;
+    vector = 2;
+    posX = 0;
+    posY = 0;
 }
 
 void Ship::Destroy()
 {
     if (slower == 5)
     {
-        this->IsDestroy = true;
-        if (this->color > 0)
-            this->color -= 0.2f;
+        is_destroyed = true;
+        if (color > 0)
+            color -= 0.2f;
 
-        this->destroyCount = (this->destroyCount + 1) % 6;
+        deaths = (deaths + 1) % ship_life;
 
-        if (this->destroyCount == 0)
+        if (deaths == 0)
         {
-            this->IsDestroy = false;
-            this->angle = 0;
-            this->posX = 0;
-            this->posY = 0;
-            this->destroyCount = 0;
-            this->color = 1.0f;
+            is_destroyed = false;
+            angle = 0;
+            posX = 0;
+            posY = 0;
+            deaths = 0;
+            color = 1.0f;
         }
     }
     slower = (slower + 1) % 6;
@@ -43,21 +44,21 @@ void Ship::Destroy()
 
 void Ship::Update(bool ShiftBackMode)
 {
-    if (IsDestroy == false)
+    if (is_destroyed == false)
     {
         GLfloat MODE = 1.0f;
 
         if (ShiftBackMode)
             MODE = -1.0f;
 
-        this->posX += MODE * cos(angle * M_PI / 180.0f) * vector;
-        this->posY += MODE * sin(angle * M_PI / 180.0f) * vector;
+        posX += MODE * cos(angle * M_PI / 180.0f) * vector;
+        posY += MODE * sin(angle * M_PI / 180.0f) * vector;
 
-        if (this->posX > 400 || this->posX < -400)
-            this->posX *= -1;
+        if (posX > 400 || posX < -400)
+            posX *= -1;
 
-        if (this->posY > 300 || this->posY < -300)
-            this->posY *= -1;
+        if (posY > 300 || posY < -300)
+            posY *= -1;
     }
 }
 
@@ -73,7 +74,7 @@ void Ship::Draw()
     //
 
     glBegin(GL_POLYGON);
-    glColor3f(this->color, this->color, this->color);
+    glColor3f(color, color, color);
     glVertex2f(+15.0f, 0.0f);
     glVertex2f(-15.0f, -10.0f);
     glVertex2f(-5.0f, 0.0f);
