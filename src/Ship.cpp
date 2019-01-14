@@ -1,7 +1,7 @@
 #include "Ship.hpp"
 
-#include <windows.h>
 #include <gl/GLU.h>
+#include <windows.h>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -66,7 +66,7 @@ void Ship::Update(bool ShiftBackMode)
 
         if (posY > 300 || posY < -300)
             posY *= -1;
-        }
+    }
 }
 
 void Ship::Draw()
