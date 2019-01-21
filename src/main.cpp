@@ -303,13 +303,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
         return 0;
 
-    // case WM_TIMER:
-    // {
-    //     float delta{1.0f};
-    //     update(delta);
-    // }
-    //     return 0;
-
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
