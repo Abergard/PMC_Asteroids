@@ -9,7 +9,6 @@
 Ship::Ship()
 {
     angle = 0;
-    base_speed = 2;
     posX = 0;
     posY = 0;
 }
@@ -42,20 +41,10 @@ void Ship::Update(float delta, bool ShiftBackMode)
 {
     if (is_destroyed == false)
     {
-        GLfloat MODE = 1.0f;
+        const int speed = ShiftBackMode ? backward_speed : forward_speed;
 
-        if (ShiftBackMode)
-        {
-            MODE = -1.0f;
-            base_speed = 1;
-        }
-        else
-        {
-            base_speed = 2;
-        }
-
-        posX += MODE * cos(angle * M_PI / 180.0f) * base_speed * delta;
-        posY += MODE * sin(angle * M_PI / 180.0f) * base_speed * delta;
+        posX += cos(angle * M_PI / 180.0f) * speed * delta;
+        posY += sin(angle * M_PI / 180.0f) * speed * delta;
 
         if (posX > 400 || posX < -400)
             posX *= -1;

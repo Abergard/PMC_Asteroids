@@ -7,6 +7,7 @@
 #include <exception>
 #include <iostream>
 #include <cmath>
+#include <chrono>
 
 #include "Vehicle.hpp"
 
@@ -169,29 +170,29 @@ private:
 
 void update(float delta)
 {
-    if (!racket.is_destroyed)
-    {
-        Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
-    }
+    // if (!racket.is_destroyed)
+    // {
+    //     Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
+    // }
     racket.Update(delta, ShiftBackMode);
 
-    if (IsAsteroid)
-    {
-        IsAsteroid = asteroid.Update(delta);
-    }
-    else
-    {
-        if (asteroidBuffer >= 100)
-        {
-            asteroidBuffer = 0;
-            asteroid.RandPosition();
-            IsAsteroid = true;
-        }
-        else
-        {
-            ++asteroidBuffer;
-        }
-    }
+    // if (IsAsteroid)
+    // {
+    //     IsAsteroid = asteroid.Update(delta);
+    // }
+    // else
+    // {
+    //     if (asteroidBuffer >= 100)
+    //     {
+    //         asteroidBuffer = 0;
+    //         asteroid.RandPosition();
+    //         IsAsteroid = true;
+    //     }
+    //     else
+    //     {
+    //         ++asteroidBuffer;
+    //     }
+    // }
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -209,6 +210,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     srand(time(NULL));
 
     bool app_running = true;
+    auto previous_frame{std::chrono::high_resolution_clock::now()};
     while (app_running)
     {
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -226,9 +228,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
         }
         else
         {
+            const auto now{std::chrono::high_resolution_clock::now()};
+            const std::chrono::duration<float> delta{now - previous_frame};
+            previous_frame = now;
+
             display();
             window.swap_buffers();
-            // update();
+            update(delta.count());
         }
     }
 
@@ -297,12 +303,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
         return 0;
 
-    case WM_TIMER:
-    {
-        float delta{1.0f};
-        update(delta);
-    }
-        return 0;
+    // case WM_TIMER:
+    // {
+    //     float delta{1.0f};
+    //     update(delta);
+    // }
+    //     return 0;
 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);

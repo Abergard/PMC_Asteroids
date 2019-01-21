@@ -22,5 +22,8 @@ public:
 private:
     void Destroy(float delta);
 
+
+    const int forward_speed{80};
+    const int backward_speed{-50};
     const int max_lifes{6};
 };
