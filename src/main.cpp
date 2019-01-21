@@ -167,21 +167,17 @@ private:
     HWND hWnd;
 };
 
-void update()
+void update(float delta)
 {
-    if (racket.is_destroyed)
-    {
-        racket.Destroy();
-    }
-    else
+    if (!racket.is_destroyed)
     {
         Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
-        racket.Update(ShiftBackMode);
     }
+    racket.Update(delta, ShiftBackMode);
 
     if (IsAsteroid)
     {
-        IsAsteroid = asteroid.Update();
+        IsAsteroid = asteroid.Update(delta);
     }
     else
     {
@@ -297,16 +293,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_SPACE:
             asteroid.RandPosition();
             break;
-
-        case VK_TAB:
-            racket.is_destroyed = true;
-            break;
         }
     }
         return 0;
 
     case WM_TIMER:
-        update();
+    {
+        float delta{1.0f};
+        update(delta);
+    }
         return 0;
 
     default:
@@ -352,5 +347,6 @@ void Collision(GLfloat first_x,
     float distance = sqrt((tmp_x * tmp_x) + (tmp_y * tmp_y));
 
     if (distance < 54.0f)
+        // racket.Destroy();
         racket.is_destroyed = true;
 }

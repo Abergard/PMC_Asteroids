@@ -80,10 +80,10 @@ void Asteroid::Draw()
     glPopMatrix();
 }
 
-bool Asteroid::Update()
+bool Asteroid::Update(float delta)
 {
-    this->posX += cos(angle * M_PI / 180.0f) * my_vector;
-    this->posY += sin(angle * M_PI / 180.0f) * my_vector;
+    this->posX += cos(angle * M_PI / 180.0f) * my_vector * delta;
+    this->posY += sin(angle * M_PI / 180.0f) * my_vector * delta;
 
     if (this->posX > 400 + 50 || this->posX < -400 - 50)
         return false;
@@ -91,7 +91,7 @@ bool Asteroid::Update()
     if (this->posY > 300 + 50 || this->posY < -300 - 50)
         return false;
 
-    rotation += 1;
+    rotation += 1 * delta;
 
     if (rotation > 360.0f)
         rotation -= 360.0f;

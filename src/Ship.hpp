@@ -2,16 +2,25 @@
 
 #include "Vehicle.hpp"
 
+struct health
+{
+    int value;
+};
+
 class Ship : public Vehicle
 {
 public:
     Ship(void);
-    void Destroy(void);
-    void Update(bool ShiftBackMode);
+    void Update(float delta, bool ShiftBackMode);
     void Draw(void);
 
     bool is_destroyed{false};
     int deaths{0};
     float color{1.0f};
     int slower{0};
+
+private:
+    void Destroy(float delta);
+
+    const int max_lifes{6};
 };

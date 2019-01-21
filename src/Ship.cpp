@@ -6,11 +6,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-namespace
-{
-constexpr int ship_life{6};
-}
-
 Ship::Ship()
 {
     angle = 0;
@@ -19,15 +14,16 @@ Ship::Ship()
     posY = 0;
 }
 
-void Ship::Destroy()
+void Ship::Destroy(float delta)
 {
+    // TODO: replace slower with delta
     if (slower == 5)
     {
         is_destroyed = true;
         if (color > 0)
-            color -= 0.2f;
+            color -= 0.2f * delta;
 
-        deaths = (deaths + 1) % ship_life;
+        deaths = (deaths + 1) % max_lifes;
 
         if (deaths == 0)
         {
@@ -42,7 +38,7 @@ void Ship::Destroy()
     slower = (slower + 1) % 6;
 }
 
-void Ship::Update(bool ShiftBackMode)
+void Ship::Update(float delta, bool ShiftBackMode)
 {
     if (is_destroyed == false)
     {
@@ -58,14 +54,18 @@ void Ship::Update(bool ShiftBackMode)
             base_speed = 2;
         }
 
-        posX += MODE * cos(angle * M_PI / 180.0f) * base_speed;
-        posY += MODE * sin(angle * M_PI / 180.0f) * base_speed;
+        posX += MODE * cos(angle * M_PI / 180.0f) * base_speed * delta;
+        posY += MODE * sin(angle * M_PI / 180.0f) * base_speed * delta;
 
         if (posX > 400 || posX < -400)
             posX *= -1;
 
         if (posY > 300 || posY < -300)
             posY *= -1;
+    }
+    else
+    {
+        Destroy(delta);
     }
 }
 
