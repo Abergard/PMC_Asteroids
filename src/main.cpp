@@ -26,7 +26,7 @@ void display();
 bool ShiftBackMode = false;
 int TimeCount = 0;
 
-int asteroidBuffer = 0;
+float asteroidBuffer = 0;
 bool IsAsteroid = false;
 
 float angle = 2.0f;
@@ -170,29 +170,29 @@ private:
 
 void update(float delta)
 {
-    // if (!racket.is_destroyed)
-    // {
-    //     Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
-    // }
+    if (!racket.is_destroyed)
+    {
+        Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
+    }
     racket.Update(delta, ShiftBackMode);
 
-    // if (IsAsteroid)
-    // {
-    //     IsAsteroid = asteroid.Update(delta);
-    // }
-    // else
-    // {
-    //     if (asteroidBuffer >= 100)
-    //     {
-    //         asteroidBuffer = 0;
-    //         asteroid.RandPosition();
-    //         IsAsteroid = true;
-    //     }
-    //     else
-    //     {
-    //         ++asteroidBuffer;
-    //     }
-    // }
+    if (IsAsteroid)
+    {
+        IsAsteroid = asteroid.Update(delta);
+    }
+    else
+    {
+        if (asteroidBuffer >= 2)
+        {
+            asteroidBuffer = 0;
+            asteroid.RandPosition();
+            IsAsteroid = true;
+        }
+        else
+        {
+            asteroidBuffer += delta;
+        }
+    }
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,

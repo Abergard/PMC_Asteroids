@@ -15,16 +15,15 @@ Ship::Ship()
 
 void Ship::Destroy(float delta)
 {
-    // TODO: replace slower with delta
-    if (slower == 5)
+    slower += delta;
+    if (slower > 0.2)
     {
         is_destroyed = true;
         if (color > 0)
-            color -= 0.2f * delta;
-
-        deaths = (deaths + 1) % max_lifes;
-
-        if (deaths == 0)
+        {
+            color -= 0.1f;
+        }
+        else
         {
             is_destroyed = false;
             angle = 0;
@@ -33,8 +32,8 @@ void Ship::Destroy(float delta)
             deaths = 0;
             color = 1.0f;
         }
+        slower = 0;
     }
-    slower = (slower + 1) % 6;
 }
 
 void Ship::Update(float delta, bool ShiftBackMode)

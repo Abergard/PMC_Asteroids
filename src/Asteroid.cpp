@@ -8,13 +8,9 @@
 
 Asteroid::Asteroid()
 {
-    IsExist = false;
-    this->rotation = 0;
     this->posX = 0;
     this->posY = 0;
     this->angle = 0;
-    this->my_vector = 1;
-    base_speed = 1;
     RandPosition();
 }
 
@@ -62,6 +58,7 @@ void Asteroid::Draw()
     glRotatef(rotation, 0, 0, 1);
 
     glBegin(GL_POLYGON);
+    glColor3f(1,1,1);
     glVertex2f(+50.0f, -10.0f);
     glVertex2f(+20.0f, -50.0f);
     glVertex2f(-5.0f, -50.0f);

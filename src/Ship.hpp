@@ -17,7 +17,7 @@ public:
     bool is_destroyed{false};
     int deaths{0};
     float color{1.0f};
-    int slower{0};
+    float slower{0};
 
 private:
     void Destroy(float delta);
