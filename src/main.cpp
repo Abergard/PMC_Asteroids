@@ -29,7 +29,14 @@ bool IsAsteroid = false;
 
 float angle = 2.0f;
 
-bool is_collided(const Transform& first, const Transform& second);
+bool is_collided(const Transform& first,
+                 const Transform& second)
+{
+    const auto x = first.location_x - second.location_x;
+    const auto y = first.location_y - second.location_y;
+    const auto distance = sqrt((x * x) + (y * y));
+    return distance < 54.0f;
+}
 
 struct ROZMIAR
 {
@@ -325,24 +332,4 @@ void display()
     {
         asteroid.Draw();
     }
-}
-
-bool is_collided(const Transform& first,
-                 const Transform& second)
-{
-    float tmp_x = first.location_x - second.location_x;
-    float tmp_y = first.location_y - second.location_y;
-
-    if (tmp_x < 0)
-        tmp_x *= -1;
-
-    if (tmp_y < 0)
-        tmp_y *= -1;
-
-    const float distance = sqrt((tmp_x * tmp_x) + (tmp_y * tmp_y));
-
-    if (distance < 54.0f)
-        return true;
-
-    return false;
 }
