@@ -8,9 +8,6 @@
 
 Ship::Ship()
 {
-    angle = 0;
-    posX = 0;
-    posY = 0;
 }
 
 void Ship::Destroy(float delta)
@@ -26,9 +23,9 @@ void Ship::Destroy(float delta)
         else
         {
             is_destroyed = false;
-            angle = 0;
-            posX = 0;
-            posY = 0;
+            transform.rotation = 0;
+            transform.location_x = 0;
+            transform.location_y = 0;
             deaths = 0;
             color = 1.0f;
         }
@@ -42,14 +39,14 @@ void Ship::Update(float delta, bool ShiftBackMode)
     {
         const int speed = ShiftBackMode ? backward_speed : forward_speed;
 
-        posX += cos(angle * M_PI / 180.0f) * speed * delta;
-        posY += sin(angle * M_PI / 180.0f) * speed * delta;
+        transform.location_x += cos(transform.rotation * M_PI / 180.0f) * speed * delta;
+        transform.location_y += sin(transform.rotation * M_PI / 180.0f) * speed * delta;
 
-        if (posX > 400 || posX < -400)
-            posX *= -1;
+        if (transform.location_x > 400 || transform.location_x < -400)
+            transform.location_x *= -1;
 
-        if (posY > 300 || posY < -300)
-            posY *= -1;
+        if (transform.location_y > 300 || transform.location_y < -300)
+            transform.location_y *= -1;
     }
     else
     {
@@ -64,8 +61,8 @@ void Ship::Draw()
     glPushMatrix();
 
     // only for change
-    glTranslatef(posX, posY, 0);
-    glRotatef(angle, 0, 0, 1);
+    glTranslatef(transform.location_x, transform.location_y, 0);
+    glRotatef(transform.rotation, 0, 0, 1);
     //
 
     glBegin(GL_POLYGON);

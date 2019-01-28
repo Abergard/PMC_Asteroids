@@ -8,9 +8,6 @@
 
 Asteroid::Asteroid()
 {
-    this->posX = 0;
-    this->posY = 0;
-    this->angle = 0;
     RandPosition();
 }
 
@@ -20,27 +17,27 @@ void Asteroid::RandPosition(void)
 
     if (site < 800)
     {
-        this->posX = site - 400;
-        this->posY = 300 + 50;
-        this->angle = rand() % 180 + 180;
+        transform.location_x = site - 400;
+        transform.location_y = 300 + 50;
+        transform.rotation = rand() % 180 + 180;
     }
     else if (site < 1400)
     {
-        this->posX = 400 + 50;
-        this->posY = site - 1100;
-        this->angle = rand() % 180 + 90;
+        transform.location_x = 400 + 50;
+        transform.location_y = site - 1100;
+        transform.rotation = rand() % 180 + 90;
     }
     else if (site < 2200)
     {
-        this->posX = site - 1800;
-        this->posY = -300 - 50;
-        this->angle = rand() % 180;
+        transform.location_x = site - 1800;
+        transform.location_y = -300 - 50;
+        transform.rotation = rand() % 180;
     }
     else
     {
-        this->posX = -400 - 50;
-        this->posY = site - 2500;
-        this->angle = rand() % 180 - 90;
+        transform.location_x = -400 - 50;
+        transform.location_y = site - 2500;
+        transform.rotation = rand() % 180 - 90;
     }
 
     int speed = base_speed * (rand() % 3 + 1);
@@ -54,8 +51,8 @@ void Asteroid::Draw()
     glPushMatrix();
 
     // only for change
-    glTranslatef(posX, posY, 0);
-    glRotatef(rotation, 0, 0, 1);
+    glTranslatef(transform.location_x, transform.location_y, 0);
+    glRotatef(transform.rotation, 0, 0, 1);
 
     glBegin(GL_POLYGON);
     glColor3f(1,1,1);
@@ -79,19 +76,19 @@ void Asteroid::Draw()
 
 bool Asteroid::Update(float delta)
 {
-    this->posX += cos(angle * M_PI / 180.0f) * my_vector * delta;
-    this->posY += sin(angle * M_PI / 180.0f) * my_vector * delta;
+    transform.location_x += cos(transform.rotation * M_PI / 180.0f) * my_vector * delta;
+    transform.location_y += sin(transform.rotation * M_PI / 180.0f) * my_vector * delta;
 
-    if (this->posX > 400 + 50 || this->posX < -400 - 50)
+    if (transform.location_x > 400 + 50 || transform.location_x < -400 - 50)
         return false;
 
-    if (this->posY > 300 + 50 || this->posY < -300 - 50)
+    if (transform.location_y > 300 + 50 || transform.location_y < -300 - 50)
         return false;
 
-    rotation += 1 * delta;
+    transform.rotation += 1 * delta;
 
-    if (rotation > 360.0f)
-        rotation -= 360.0f;
+    if (transform.rotation > 360.0f)
+        transform.rotation -= 360.0f;
 
     return true;
 }

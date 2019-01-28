@@ -9,8 +9,6 @@
 #include <cmath>
 #include <chrono>
 
-#include "Vehicle.hpp"
-
 #include "Asteroid.hpp"
 #include "Ship.hpp"
 
@@ -31,10 +29,7 @@ bool IsAsteroid = false;
 
 float angle = 2.0f;
 
-void Collision(GLfloat first_x,
-               GLfloat first_y,
-               GLfloat second_x,
-               GLfloat second_y);
+bool is_collided(const Transform& first, const Transform& second);
 
 struct ROZMIAR
 {
@@ -172,7 +167,10 @@ void update(float delta)
 {
     if (!racket.is_destroyed)
     {
-        Collision(racket.posX, racket.posY, asteroid.posX, asteroid.posY);
+        if(is_collided(racket.transform, asteroid.transform))
+        {
+            racket.is_destroyed = true;
+        }
     }
     racket.Update(delta, ShiftBackMode);
 
@@ -275,17 +273,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
         case VK_LEFT:
-            racket.angle += angle;
+            racket.transform.rotation += angle;
 
-            if (racket.angle > 360.0f)
-                racket.angle -= 360.0f;
+            if (racket.transform.rotation > 360.0f)
+                racket.transform.rotation -= 360.0f;
             break;
 
         case VK_RIGHT:
-            if (racket.angle <= 0.0f)
-                racket.angle = 360.0f - angle;
+            if (racket.transform.rotation <= 0.0f)
+                racket.transform.rotation = 360.0f - angle;
             else
-                racket.angle -= angle;
+                racket.transform.rotation -= angle;
             break;
 
         case VK_UP:
@@ -329,13 +327,11 @@ void display()
     }
 }
 
-void Collision(GLfloat first_x,
-               GLfloat first_y,
-               GLfloat second_x,
-               GLfloat second_y)
+bool is_collided(const Transform& first,
+                 const Transform& second)
 {
-    float tmp_x = first_x - second_x;
-    float tmp_y = first_y - second_y;
+    float tmp_x = first.location_x - second.location_x;
+    float tmp_y = first.location_y - second.location_y;
 
     if (tmp_x < 0)
         tmp_x *= -1;
@@ -343,9 +339,10 @@ void Collision(GLfloat first_x,
     if (tmp_y < 0)
         tmp_y *= -1;
 
-    float distance = sqrt((tmp_x * tmp_x) + (tmp_y * tmp_y));
+    const float distance = sqrt((tmp_x * tmp_x) + (tmp_y * tmp_y));
 
     if (distance < 54.0f)
-        // racket.Destroy();
-        racket.is_destroyed = true;
+        return true;
+
+    return false;
 }

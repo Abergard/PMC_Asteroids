@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Vehicle.hpp"
+#include "Transform.hpp"
 
-class Asteroid : public Vehicle
+class Asteroid
 {
 public:
     Asteroid();
@@ -15,4 +15,6 @@ public:
     bool IsExist{false};
 
     const int base_speed{30};
+
+    Transform transform{};
 };

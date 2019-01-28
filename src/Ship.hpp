@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Vehicle.hpp"
+#include "Transform.hpp"
 
 struct health
 {
     int value;
 };
 
-class Ship : public Vehicle
+class Ship
 {
 public:
     Ship(void);
@@ -19,11 +19,13 @@ public:
     float color{1.0f};
     float slower{0};
 
+    Transform transform{};
+
 private:
     void Destroy(float delta);
-
 
     const int forward_speed{80};
     const int backward_speed{-50};
     const int max_lifes{6};
+
 };
