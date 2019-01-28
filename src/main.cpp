@@ -12,22 +12,52 @@
 #include "Asteroid.hpp"
 #include "Ship.hpp"
 
-// declaration / globals
+const float rotation_step = 2.0f;
+const WORD ID_TIMER = 1;
+
+bool ShiftBackMode = false;
+float asteroidBuffer = 0;
+bool IsAsteroid = false;
+
+struct
+{
+    int x;
+    int y;
+} window_size = {800, 600};
+
+MSG msg;
+HWND g_hWnd;
+HDC hDC;
+HGLRC hRC;
+
+Ship racket{};
+Asteroid asteroid{};
+
 LRESULT CALLBACK WndProc(HWND hWnd,
                          UINT message,
                          WPARAM wParam,
                          LPARAM lParam);
 
-class Window;
-void display();
+void display()
+{
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-bool ShiftBackMode = false;
-int TimeCount = 0;
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-float asteroidBuffer = 0;
-bool IsAsteroid = false;
+    glOrtho(-400, 400, -300, 300, -1, 1);
 
-float angle = 2.0f;
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    racket.Draw();
+
+    if (IsAsteroid == true)
+    {
+        asteroid.Draw();
+    }
+}
 
 bool is_collided(const Transform& first,
                  const Transform& second)
@@ -37,24 +67,6 @@ bool is_collided(const Transform& first,
     const auto distance = sqrt((x * x) + (y * y));
     return distance < 54.0f;
 }
-
-struct ROZMIAR
-{
-    int x;
-    int y;
-} OKNO = {800, 600};
-
-const char* NazwaKlasy = "GL tutorial";
-MSG msg;
-HWND g_hWnd;
-HDC hDC;
-HGLRC hRC;
-
-Ship racket{};
-Asteroid asteroid{};
-int racket_spedd = 0;
-
-const WORD ID_TIMER = 1;
 
 class Window
 {
@@ -81,6 +93,8 @@ public:
 private:
     HWND create_window(HINSTANCE hInstance)
     {
+        const char* NazwaKlasy = "GL tutorial";
+
         WNDCLASSEX wc;
         wc.cbSize = sizeof(WNDCLASSEX);
         wc.style = CS_OWNDC;
@@ -88,12 +102,12 @@ private:
         wc.cbClsExtra = 0;
         wc.cbWndExtra = 0;
         wc.hInstance = hInstance;
-        wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+        wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-        wc.lpszMenuName = NULL;
+        wc.lpszMenuName = nullptr;
         wc.lpszClassName = NazwaKlasy;
-        wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+        wc.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 
         if (!RegisterClassEx(&wc))
         {
@@ -106,14 +120,14 @@ private:
                                    WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                    CW_USEDEFAULT,
                                    CW_USEDEFAULT,
-                                   OKNO.x,
-                                   OKNO.y,
-                                   NULL,
-                                   NULL,
+                                   window_size.x,
+                                   window_size.y,
+                                   nullptr,
+                                   nullptr,
                                    hInstance,
-                                   NULL);
+                                   nullptr);
 
-        if (hWnd == NULL)
+        if (hWnd == nullptr)
         {
             throw std::exception{"Window creation failed"};
         }
@@ -162,7 +176,7 @@ private:
 
     void disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC)
     {
-        wglMakeCurrent(NULL, NULL);
+        wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(hRC);
         ReleaseDC(hWnd, hDC);
     }
@@ -208,17 +222,17 @@ int WINAPI WinMain(HINSTANCE hInstance,
     Window window{hInstance};
 
     // TODO: replace TIMER by DeltaTime
-    if (SetTimer(window.handle(), ID_TIMER, 20, NULL) == 0)
+    if (SetTimer(window.handle(), ID_TIMER, 20, nullptr) == 0)
         MessageBox(
             window.handle(), "Can not create timer", "Blad", MB_ICONSTOP);
 
-    srand(time(NULL));
+    srand(time(nullptr));
 
     bool app_running = true;
     auto previous_frame{std::chrono::high_resolution_clock::now()};
     while (app_running)
     {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             switch (msg.message)
             {
@@ -247,12 +261,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 }
 catch (const std::exception& ex)
 {
-    MessageBox(NULL, ex.what(), "Create Error", MB_ICONEXCLAMATION);
+    MessageBox(nullptr, ex.what(), "Create Error", MB_ICONEXCLAMATION);
 }
 catch (...)
 {
     MessageBox(
-        NULL, "Unexpected exception", "Create Error", MB_ICONEXCLAMATION);
+        nullptr, "Unexpected exception", "Create Error", MB_ICONEXCLAMATION);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -280,7 +294,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
         case VK_LEFT:
-            racket.transform.rotation += angle;
+            racket.transform.rotation += rotation_step;
 
             if (racket.transform.rotation > 360.0f)
                 racket.transform.rotation -= 360.0f;
@@ -288,9 +302,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case VK_RIGHT:
             if (racket.transform.rotation <= 0.0f)
-                racket.transform.rotation = 360.0f - angle;
+                racket.transform.rotation = 360.0f - rotation_step;
             else
-                racket.transform.rotation -= angle;
+                racket.transform.rotation -= rotation_step;
             break;
 
         case VK_UP:
@@ -310,26 +324,5 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-}
-
-void display()
-{
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    glOrtho(-400, 400, -300, 300, -1, 1);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    racket.Draw();
-
-    if (IsAsteroid == true)
-    {
-        asteroid.Draw();
     }
 }
