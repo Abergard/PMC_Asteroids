@@ -31,13 +31,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 
 add_executable(asteroids
   src/main.cpp
+
+  # actors
   src/actors/Asteroid.cpp
   src/actors/Ship.cpp
+
+  # window
   )
 
 target_include_directories(asteroids PRIVATE
-  ${CMAKE_CURRENT_LIST_DIR}/src/actors
-  ${CMAKE_CURRENT_LIST_DIR}/src/components)
+  ${CMAKE_CURRENT_LIST_DIR}/src/)
 
 set_target_properties(asteroids PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
 target_link_libraries(asteroids gdi32 user32 glu32 opengl32)

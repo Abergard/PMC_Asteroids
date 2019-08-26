@@ -1,4 +1,4 @@
-#include "Ship.hpp"
+#include "actors/Ship.hpp"
 
 #include <windows.h>
 #include <gl/GLU.h>

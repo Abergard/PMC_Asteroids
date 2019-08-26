@@ -1,4 +1,4 @@
-#include "Asteroid.hpp"
+#include "actors/Asteroid.hpp"
 
 #include <windows.h>
 #include <gl/GLU.h>
