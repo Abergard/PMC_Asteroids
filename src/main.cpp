@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    int nCmdShow)
 try
 {
-    Win32Window window{};
+    Win32Window window{800, 600};
 
     auto previous_frame{std::chrono::high_resolution_clock::now()};
     while (window.is_open())

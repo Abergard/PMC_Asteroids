@@ -14,9 +14,9 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 
-set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/imsvc ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-  --driver-mode=cl -fms-compatibility-version=19")
+# set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/imsvc ")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+#   --driver-mode=cl -fms-compatibility-version=19")
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Werror\
 #  -Wno-c++98-compat -Wno-c++98-compat-pedantic\
@@ -35,6 +35,7 @@ add_executable(asteroids
   # actors
   src/actors/Asteroid.cpp
   src/actors/Ship.cpp
+  src/windows/Win32Window.cpp
 
   # window
   )
