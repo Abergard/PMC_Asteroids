@@ -1,29 +1,26 @@
 #pragma once
 
-#include <functional>
-#include <iostream>
 #include <windows.h>
 
-#include "actors/Asteroid.hpp"
-#include "actors/Ship.hpp"
+#include <functional>
+#include <iostream>
 
-extern const float rotation_step;
-extern bool ShiftBackMode;
-extern Ship racket;
-extern Asteroid asteroid;
-
-struct Win32Message
+struct Win32Event
 {
+    UINT message;
+    WPARAM wparam;
 };
 
 class Win32Window
 {
 public:
+    using Win32EventCallback = std::function<void(Win32Event)>;
+
     Win32Window(const std::int32_t window_width,
                 const std::int32_t window_height);
 
     void handle_window_events();
-    void subscribe(std::function<void(Win32Message&)>);
+    void subscribe(Win32EventCallback);
     bool is_open();
     void swap_buffers();
 
@@ -36,6 +33,8 @@ private:
                                  LPARAM lParam);
     void enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC);
     void disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC);
+
+    Win32EventCallback win32_message_callback = [](auto) {};
 
     HWND window_handle{nullptr};
     HDC hDC{};

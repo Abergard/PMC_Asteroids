@@ -2,11 +2,6 @@
 
 #include <gl\GLU.h>
 
-const float rotation_step = 2.0f;
-bool ShiftBackMode = false;
-Ship racket{};
-Asteroid asteroid{};
-
 Win32Window::Win32Window(const std::int32_t window_width,
                          const std::int32_t window_height)
 {
@@ -98,18 +93,17 @@ void Win32Window::send_close_event(HWND hWnd)
     PostMessage(hWnd, WM_CLOSE, 0, 0);
 }
 
+void Win32Window::subscribe(Win32EventCallback callback)
+{
+    win32_message_callback = callback;
+}
+
 LRESULT CALLBACK Win32Window::realWndProc(HWND hWnd,
                                           UINT message,
                                           WPARAM wParam,
                                           LPARAM lParam)
 {
-    // const auto notify_event =
-    //     [msg = Win32Message{message, wParama}](const auto& subscriber) {
-    //         subscriber->on_call(msg);
-    //     };
-
-    // std::for_each(
-    //     std::cbegin(subscribers), std::cend(subscribers), notify_event);
+    win32_message_callback(Win32Event{message, wParam});
 
     switch (message)
     {
@@ -120,40 +114,11 @@ LRESULT CALLBACK Win32Window::realWndProc(HWND hWnd,
     case WM_KEYDOWN:
         switch (wParam)
         {
-        case VK_MENU:
-            break;
-
         case VK_ESCAPE:
+
             send_close_event(hWnd);
-            break;
-
-        case VK_LEFT:
-            racket.transform.rotation += rotation_step;
-
-            if (racket.transform.rotation > 360.0f)
-                racket.transform.rotation -= 360.0f;
-            break;
-
-        case VK_RIGHT:
-            if (racket.transform.rotation <= 0.0f)
-                racket.transform.rotation = 360.0f - rotation_step;
-            else
-                racket.transform.rotation -= rotation_step;
-            break;
-
-        case VK_UP:
-            ShiftBackMode = false;
-            break;
-
-        case VK_DOWN:
-            ShiftBackMode = true;
-            break;
-
-        case VK_SPACE:
-            asteroid.RandPosition();
-            break;
+            return 0;
         }
-        return 0;
 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);

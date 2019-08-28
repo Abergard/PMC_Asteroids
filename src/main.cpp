@@ -1,23 +1,27 @@
 #include <windows.h>
 
-#include <gl\GLU.h>
-#include <stdlib.h>
-
 #include <chrono>
 #include <cmath>
 #include <ctime>
 #include <exception>
 #include <functional>
+#include <gl\GLU.h>
 #include <iostream>
+#include <stdlib.h>
 
-// #include "actors/Asteroid.hpp"
-// #include "actors/Ship.hpp"
+#include "actors/Asteroid.hpp"
+#include "actors/Ship.hpp"
 #include "windows/Win32Window.hpp"
 
 const WORD ID_TIMER = 1;
 
 float asteroidBuffer = 0;
 bool IsAsteroid = false;
+
+const float rotation_step = 2.0f;
+bool ShiftBackMode = false;
+Ship racket{};
+Asteroid asteroid{};
 
 MSG msg;
 
@@ -93,6 +97,42 @@ public:
     void observe(KeyEvent, std::function<void()>);
 };
 
+void updateGame(Win32Event event)
+{
+    switch (event.message)
+    {
+    case WM_KEYDOWN:
+        switch (event.wparam)
+        {
+        case VK_LEFT:
+            racket.transform.rotation += rotation_step;
+
+            if (racket.transform.rotation > 360.0f)
+                racket.transform.rotation -= 360.0f;
+            break;
+
+        case VK_RIGHT:
+            if (racket.transform.rotation <= 0.0f)
+                racket.transform.rotation = 360.0f - rotation_step;
+            else
+                racket.transform.rotation -= rotation_step;
+            break;
+
+        case VK_UP:
+            ShiftBackMode = false;
+            break;
+
+        case VK_DOWN:
+            ShiftBackMode = true;
+            break;
+
+        case VK_SPACE:
+            asteroid.RandPosition();
+            break;
+        }
+    }
+}
+
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrievInstance,
                    LPSTR lpCmdLine,
@@ -100,6 +140,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 try
 {
     Win32Window window{800, 600};
+    window.subscribe(updateGame);
 
     auto previous_frame{std::chrono::high_resolution_clock::now()};
     while (window.is_open())
