@@ -14,12 +14,13 @@
 #include "actors/Asteroid.hpp"
 #include "actors/Ship.hpp"
 #include "frame_clock.hpp"
+#include "keyboard.hpp"
 #include "windows/Win32Window.hpp"
 
 class Game
 {
 public:
-    Game(Window& w) : window{w}
+    Game(Window& w, Keyboard& k) : window{w}, keyboard{k}
     {
     }
 
@@ -114,6 +115,36 @@ private:
 
     void update_logic(float delta)
     {
+        if (keyboard.is(KeyboardKey::left, KeyState::pressed))
+        {
+            racket.transform.rotation += rotation_step;
+
+            if (racket.transform.rotation > 360.0f)
+                racket.transform.rotation -= 360.0f;
+        }
+        if (keyboard.is(KeyboardKey::right, KeyState::pressed))
+        {
+            if (racket.transform.rotation <= 0.0f)
+                racket.transform.rotation = 360.0f - rotation_step;
+            else
+                racket.transform.rotation -= rotation_step;
+        }
+
+        if (keyboard.is(KeyboardKey::up, KeyState::pressed))
+        {
+            ShiftBackMode = false;
+        }
+
+        if (keyboard.is(KeyboardKey::down, KeyState::pressed))
+        {
+            ShiftBackMode = true;
+        }
+
+        if (keyboard.is(KeyboardKey::space, KeyState::pressed))
+        {
+            asteroid.RandPosition();
+        }
+
         if (!racket.is_destroyed)
         {
             if (is_collided(racket.transform, asteroid.transform))
@@ -154,4 +185,5 @@ private:
     MSG msg;
 
     Window& window;
+    Keyboard& keyboard;
 };

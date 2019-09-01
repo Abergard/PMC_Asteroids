@@ -13,25 +13,6 @@ struct Win32Event
     WPARAM wparam;
 };
 
-enum class KeyboardKey
-{
-    Unknown,
-    Space,
-    ArrowLeft,
-    ArrowUp,
-    ArrowRight,
-    ArrowDown
-};
-
-class Keyboard
-{
-public:
-    virtual ~Keyboard() = default;
-
-    virtual bool is_key_up(KeyboardKey) const = 0;
-    virtual bool is_key_down(KeyboardKey) const = 0;
-};
-
 class Win32Window : public Window
 {
 public:
