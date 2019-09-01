@@ -1,6 +1,6 @@
 #include "windows/Win32Window.hpp"
 
-#include <gl\GLU.h>
+#include <gl/GLU.h>
 
 Win32Window::Win32Window(const std::int32_t window_width,
                          const std::int32_t window_height)

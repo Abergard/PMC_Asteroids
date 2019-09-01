@@ -25,7 +25,7 @@ Asteroid asteroid{};
 
 MSG msg;
 
-void display()
+void update_surface()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -54,7 +54,7 @@ bool is_collided(const Transform& first, const Transform& second)
     return distance < 54.0f;
 }
 
-void update(float delta)
+void update_logic(float delta)
 {
     if (!racket.is_destroyed)
     {
@@ -133,6 +133,27 @@ void updateGame(Win32Event event)
     }
 }
 
+class FrameClock
+{
+public:
+    float calculate_delta()
+    {
+        const auto now{std::chrono::high_resolution_clock::now()};
+        const std::chrono::duration<float> delta{now - previous_frame};
+        previous_frame = now;
+        return delta.count();
+    }
+
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> previous_frame{
+        std::chrono::high_resolution_clock::now()};
+};
+
+void display_surface(Win32Window window)
+{
+    window.swap_buffers();
+}
+
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrievInstance,
                    LPSTR lpCmdLine,
@@ -142,18 +163,19 @@ try
     Win32Window window{800, 600};
     window.subscribe(updateGame);
 
-    auto previous_frame{std::chrono::high_resolution_clock::now()};
+    FrameClock frame_clock;
+
     while (window.is_open())
     {
+        // read input
         window.handle_window_events();
 
-        const auto now{std::chrono::high_resolution_clock::now()};
-        const std::chrono::duration<float> delta{now - previous_frame};
-        previous_frame = now;
+        // update game logic
+        update_logic(frame_clock.calculate_delta());
 
-        update(delta.count());
-        display();
-        window.swap_buffers();
+        //render surface
+        update_surface();
+        display_surface(window);
     }
 }
 catch (const std::exception& ex)
