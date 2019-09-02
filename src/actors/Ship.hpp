@@ -24,7 +24,9 @@ public:
     template <typename Component>
     Component* get()
     {
-        return std::get<Component*>(components);
+        return const_cast<Component*>(
+            static_cast<const TWorldObject<Components...>&>(*this)
+                .get<Component>());
     }
 
     template <typename Component>
