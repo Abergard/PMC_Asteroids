@@ -1,10 +1,11 @@
+#define _USE_MATH_DEFINES
+
 #include "actors/Ship.hpp"
 
 #include <windows.h>
-#include <gl/GLU.h>
 
-#define _USE_MATH_DEFINES
 #include <cmath>
+#include <gl/GLU.h>
 
 Ship::Ship()
 {
@@ -33,14 +34,16 @@ void Ship::Destroy(float delta)
     }
 }
 
-void Ship::Update(float delta, bool ShiftBackMode)
+void Ship::on_update(float delta)
 {
     if (is_destroyed == false)
     {
-        const int speed = ShiftBackMode ? backward_speed : forward_speed;
+        const int speed = direction.forward ? forward_speed : backward_speed;
 
-        transform.location_x += cos(transform.rotation * M_PI / 180.0f) * speed * delta;
-        transform.location_y += sin(transform.rotation * M_PI / 180.0f) * speed * delta;
+        transform.location_x +=
+            cos(transform.rotation * M_PI / 180.0f) * speed * delta;
+        transform.location_y +=
+            sin(transform.rotation * M_PI / 180.0f) * speed * delta;
 
         if (transform.location_x > 400 || transform.location_x < -400)
             transform.location_x *= -1;
@@ -52,30 +55,4 @@ void Ship::Update(float delta, bool ShiftBackMode)
     {
         Destroy(delta);
     }
-}
-
-void Ship::Draw()
-{
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glPushMatrix();
-
-    // only for change
-    glTranslatef(transform.location_x, transform.location_y, 0);
-    glRotatef(transform.rotation, 0, 0, 1);
-    //
-
-    glBegin(GL_POLYGON);
-    glColor3f(color, color, color);
-    glVertex2f(+15.0f, 0.0f);
-    glVertex2f(-15.0f, -10.0f);
-    glVertex2f(-5.0f, 0.0f);
-    glVertex2f(-15.0f, +10.0f);
-    glEnd();
-
-    glBegin(GL_POINTS);
-    glVertex2f(0.0f, 0.0f);
-    glEnd();
-
-    glPopMatrix();
 }

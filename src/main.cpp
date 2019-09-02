@@ -45,7 +45,17 @@ try
         if (const auto key{to_keyboard_key(event.wparam)};
             key != KeyboardKey::unknown)
         {
-            keyboard.update(key, get_key_state(event.message));
+            const auto key_state = get_key_state(event.message);
+            keyboard.update(key, key_state);
+
+            if(key_state == KeyState::pressed)
+            {
+                game.on_pressed(key);
+            }
+            else if(key_state == KeyState::pressed)
+            {
+                game.on_released(key);
+            }
         }
     });
     game.run();

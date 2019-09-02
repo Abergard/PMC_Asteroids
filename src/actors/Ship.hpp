@@ -1,6 +1,8 @@
 #pragma once
 
+#include "components/Direction.hpp"
 #include "components/Transform.hpp"
+#include "keyboard.hpp"
 
 struct health
 {
@@ -11,8 +13,7 @@ class Ship
 {
 public:
     Ship(void);
-    void Update(float delta, bool ShiftBackMode);
-    void Draw(void);
+    void on_update(float delta);
 
     bool is_destroyed{false};
     int deaths{0};
@@ -20,6 +21,7 @@ public:
     float slower{0};
 
     Transform transform{};
+    Direction direction{Direction::Forward{true}};
 
 private:
     void Destroy(float delta);
@@ -27,5 +29,5 @@ private:
     const int forward_speed{80};
     const int backward_speed{-50};
     const int max_lifes{6};
-
+    const float rotation_step = 2.0f;
 };

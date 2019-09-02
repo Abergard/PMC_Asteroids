@@ -17,10 +17,96 @@
 #include "keyboard.hpp"
 #include "windows/Win32Window.hpp"
 
+namespace
+{
+void draw(const Ship& ship)
+{
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    glPushMatrix();
+
+    // only for change
+    glTranslatef(ship.transform.location_x, ship.transform.location_y, 0);
+    glRotatef(ship.transform.rotation, 0, 0, 1);
+    //
+
+    glBegin(GL_POLYGON);
+    glColor3f(ship.color, ship.color, ship.color);
+    glVertex2f(+15.0f, 0.0f);
+    glVertex2f(-15.0f, -10.0f);
+    glVertex2f(-5.0f, 0.0f);
+    glVertex2f(-15.0f, +10.0f);
+    glEnd();
+
+    glBegin(GL_POINTS);
+    glVertex2f(0.0f, 0.0f);
+    glEnd();
+
+    glPopMatrix();
+}
+
+void rotate_left(Transform& transform, const float rotation_step)
+{
+    transform.rotation += rotation_step;
+
+    if (transform.rotation > 360.0f)
+    {
+        transform.rotation -= 360.0f;
+    }
+}
+
+void rotate_right(Transform& transform, const float rotation_step)
+{
+    if (transform.rotation <= 0.0f)
+    {
+        transform.rotation = 360.0f - rotation_step;
+    }
+    else
+    {
+        transform.rotation -= rotation_step;
+    }
+}
+
+void rotate(const KeyboardKey key,
+            Transform& transform,
+            const float rotation_step)
+{
+    if (key == KeyboardKey::left)
+    {
+        rotate_left(transform, rotation_step);
+    }
+    if (key == KeyboardKey::right)
+    {
+        rotate_right(transform, rotation_step);
+    }
+}
+void set_direction(const KeyboardKey key, Direction& direction)
+{
+    if (key == KeyboardKey::up)
+    {
+        direction.forward = true;
+    }
+    else if (key == KeyboardKey::down)
+    {
+        direction.forward = false;
+    }
+}
+}
+
 class Game
 {
 public:
     Game(Window& w, Keyboard& k) : window{w}, keyboard{k}
+    {
+    }
+
+    void on_pressed(const KeyboardKey key)
+    {
+        rotate(key, racket.transform, rotation_step);
+        set_direction(key, racket.direction);
+    }
+
+    void on_released(const KeyboardKey)
     {
     }
 
@@ -42,42 +128,6 @@ public:
         }
     }
 
-    // void updateGame(Win32Event event)
-    // {
-    //     switch (event.message)
-    //     {
-    //     case WM_KEYDOWN:
-    //         switch (event.wparam)
-    //         {
-    //         case VK_LEFT:
-    //             racket.transform.rotation += rotation_step;
-
-    //             if (racket.transform.rotation > 360.0f)
-    //                 racket.transform.rotation -= 360.0f;
-    //             break;
-
-    //         case VK_RIGHT:
-    //             if (racket.transform.rotation <= 0.0f)
-    //                 racket.transform.rotation = 360.0f - rotation_step;
-    //             else
-    //                 racket.transform.rotation -= rotation_step;
-    //             break;
-
-    //         case VK_UP:
-    //             ShiftBackMode = false;
-    //             break;
-
-    //         case VK_DOWN:
-    //             ShiftBackMode = true;
-    //             break;
-
-    //         case VK_SPACE:
-    //             asteroid.RandPosition();
-    //             break;
-    //         }
-    //     }
-    // }
-
 private:
     void display_surface(Window& window)
     {
@@ -97,7 +147,7 @@ private:
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        racket.Draw();
+        draw(racket);
 
         if (IsAsteroid == true)
         {
@@ -115,31 +165,6 @@ private:
 
     void update_logic(float delta)
     {
-        if (keyboard.is(KeyboardKey::left, KeyState::pressed))
-        {
-            racket.transform.rotation += rotation_step;
-
-            if (racket.transform.rotation > 360.0f)
-                racket.transform.rotation -= 360.0f;
-        }
-        if (keyboard.is(KeyboardKey::right, KeyState::pressed))
-        {
-            if (racket.transform.rotation <= 0.0f)
-                racket.transform.rotation = 360.0f - rotation_step;
-            else
-                racket.transform.rotation -= rotation_step;
-        }
-
-        if (keyboard.is(KeyboardKey::up, KeyState::pressed))
-        {
-            ShiftBackMode = false;
-        }
-
-        if (keyboard.is(KeyboardKey::down, KeyState::pressed))
-        {
-            ShiftBackMode = true;
-        }
-
         if (keyboard.is(KeyboardKey::space, KeyState::pressed))
         {
             asteroid.RandPosition();
@@ -152,7 +177,7 @@ private:
                 racket.is_destroyed = true;
             }
         }
-        racket.Update(delta, ShiftBackMode);
+        racket.on_update(delta);
 
         if (IsAsteroid)
         {
@@ -178,7 +203,7 @@ private:
     float asteroidBuffer = 0;
     bool IsAsteroid = false;
     const float rotation_step = 2.0f;
-    bool ShiftBackMode = false;
+    bool shiftBackMode = false;
     Ship racket{};
     Asteroid asteroid{};
 
