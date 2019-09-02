@@ -5,41 +5,12 @@
 #include "components/Direction.hpp"
 #include "components/Transform.hpp"
 #include "keyboard.hpp"
+#include "world_object.hpp"
 
 struct health
 {
     int value;
 };
-
-template <typename... Components>
-class TWorldObject
-{
-public:
-    template <typename Component>
-    void add(Component* c)
-    {
-        std::get<Component*>(components) = c;
-    }
-
-    template <typename Component>
-    Component* get()
-    {
-        return const_cast<Component*>(
-            static_cast<const TWorldObject<Components...>&>(*this)
-                .get<Component>());
-    }
-
-    template <typename Component>
-    const Component* get() const
-    {
-        return std::get<Component*>(components);
-    }
-
-private:
-    std::tuple<Components*...> components;
-};
-
-using WorldObject = TWorldObject<Transform, Direction>;
 
 struct Ship
 {
@@ -49,7 +20,7 @@ struct Ship
     float slower{0};
     Transform transform;
     Direction direction{Direction::Forward{true}};
-    WorldObject ship;
+    WorldObject object{&transform, &direction};
 
     const int forward_speed{80};
     const int backward_speed{-50};

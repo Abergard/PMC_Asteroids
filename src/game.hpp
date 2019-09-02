@@ -28,10 +28,10 @@ void draw(const Ship& ship)
     glPushMatrix();
 
     // only for change
-    glTranslatef(ship.ship.get<Transform>()->location_x,
-                 ship.ship.get<Transform>()->location_y,
+    glTranslatef(ship.object.get<Transform>()->location_x,
+                 ship.object.get<Transform>()->location_y,
                  0);
-    glRotatef(ship.ship.get<Transform>()->rotation, 0, 0, 1);
+    glRotatef(ship.object.get<Transform>()->rotation, 0, 0, 1);
     //
 
     glBegin(GL_POLYGON);
@@ -108,9 +108,9 @@ void play_death_animation(Ship& ship, const float delta)
         else
         {
             ship.is_destroyed = false;
-            ship.ship.get<Transform>()->rotation = 0;
-            ship.ship.get<Transform>()->location_x = 0;
-            ship.ship.get<Transform>()->location_y = 0;
+            ship.object.get<Transform>()->rotation = 0;
+            ship.object.get<Transform>()->location_x = 0;
+            ship.object.get<Transform>()->location_y = 0;
             ship.deaths = 0;
             ship.color = 1.0f;
         }
@@ -146,14 +146,14 @@ class Game
 public:
     Game(Window& w, Keyboard& k) : window{w}, keyboard{k}
     {
-        racket.ship.add<Transform>(&racket.transform);
-        racket.ship.add<Direction>(&racket.direction);
+        // racket.object.add<Transform>(&racket.transform);
+        // racket.object.add<Direction>(&racket.direction);
     }
 
     void on_pressed(const KeyboardKey key)
     {
-        rotate(key, *racket.ship.get<Transform>(), rotation_step);
-        set_direction(key, *racket.ship.get<Direction>());
+        rotate(key, *racket.object.get<Transform>(), rotation_step);
+        set_direction(key, *racket.object.get<Direction>());
     }
 
     void on_released(const KeyboardKey)
@@ -232,7 +232,7 @@ private:
         }
         else
         {
-            move_object(racket.ship,
+            move_object(racket.object,
                         racket.forward_speed,
                         racket.backward_speed,
                         delta);
@@ -257,16 +257,11 @@ private:
         }
     }
 
-    const WORD ID_TIMER = 1;
-
     float asteroidBuffer = 0;
     bool IsAsteroid = false;
     const float rotation_step = 2.0f;
-    bool shiftBackMode = false;
     Ship racket{};
     Asteroid asteroid{};
-
-    MSG msg;
 
     Window& window;
     Keyboard& keyboard;
