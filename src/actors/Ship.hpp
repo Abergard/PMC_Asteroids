@@ -9,12 +9,8 @@ struct health
     int value;
 };
 
-class Ship
+struct Ship
 {
-public:
-    Ship(void);
-    void on_update(float delta);
-
     bool is_destroyed{false};
     int deaths{0};
     float color{1.0f};
@@ -22,9 +18,6 @@ public:
 
     Transform transform{};
     Direction direction{Direction::Forward{true}};
-
-private:
-    void Destroy(float delta);
 
     const int forward_speed{80};
     const int backward_speed{-50};

@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+
 #include <windows.h>
 
 #include <chrono>
@@ -91,6 +93,48 @@ void set_direction(const KeyboardKey key, Direction& direction)
         direction.forward = false;
     }
 }
+void play_death_animation(Ship& ship, const float delta)
+{
+    ship.slower += delta;
+    if (ship.slower > 0.2)
+    {
+        ship.is_destroyed = true;
+        if (ship.color > 0)
+        {
+            ship.color -= 0.1f;
+        }
+        else
+        {
+            ship.is_destroyed = false;
+            ship.transform.rotation = 0;
+            ship.transform.location_x = 0;
+            ship.transform.location_y = 0;
+            ship.deaths = 0;
+            ship.color = 1.0f;
+        }
+        ship.slower = 0;
+    }
+}
+
+void move_object(Transform& transform,
+                 const Direction& direction,
+                 const int forward_speed,
+                 const int backward_speed,
+                 const float delta)
+{
+    const int speed = direction.forward ? forward_speed : backward_speed;
+
+    transform.location_x +=
+        cos(transform.rotation * M_PI / 180.0f) * speed * delta;
+    transform.location_y +=
+        sin(transform.rotation * M_PI / 180.0f) * speed * delta;
+
+    if (transform.location_x > 400 || transform.location_x < -400)
+        transform.location_x *= -1;
+
+    if (transform.location_y > 300 || transform.location_y < -300)
+        transform.location_y *= -1;
+}
 }
 
 class Game
@@ -170,14 +214,24 @@ private:
             asteroid.RandPosition();
         }
 
-        if (!racket.is_destroyed)
+        if (!racket.is_destroyed &&
+            is_collided(racket.transform, asteroid.transform))
         {
-            if (is_collided(racket.transform, asteroid.transform))
-            {
-                racket.is_destroyed = true;
-            }
+            racket.is_destroyed = true;
         }
-        racket.on_update(delta);
+
+        if (racket.is_destroyed)
+        {
+            play_death_animation(racket, delta);
+        }
+        else
+        {
+            move_object(racket.transform,
+                        racket.direction,
+                        racket.forward_speed,
+                        racket.backward_speed,
+                        delta);
+        }
 
         if (IsAsteroid)
         {
