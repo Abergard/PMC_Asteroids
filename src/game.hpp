@@ -28,8 +28,10 @@ void draw(const Ship& ship)
     glPushMatrix();
 
     // only for change
-    glTranslatef(ship.transform.location_x, ship.transform.location_y, 0);
-    glRotatef(ship.transform.rotation, 0, 0, 1);
+    glTranslatef(ship.ship.get<Transform>()->location_x,
+                 ship.ship.get<Transform>()->location_y,
+                 0);
+    glRotatef(ship.ship.get<Transform>()->rotation, 0, 0, 1);
     //
 
     glBegin(GL_POLYGON);
@@ -106,9 +108,9 @@ void play_death_animation(Ship& ship, const float delta)
         else
         {
             ship.is_destroyed = false;
-            ship.transform.rotation = 0;
-            ship.transform.location_x = 0;
-            ship.transform.location_y = 0;
+            ship.ship.get<Transform>()->rotation = 0;
+            ship.ship.get<Transform>()->location_x = 0;
+            ship.ship.get<Transform>()->location_y = 0;
             ship.deaths = 0;
             ship.color = 1.0f;
         }
@@ -116,24 +118,26 @@ void play_death_animation(Ship& ship, const float delta)
     }
 }
 
-void move_object(Transform& transform,
-                 const Direction& direction,
+void move_object(WorldObject obj,
                  const int forward_speed,
                  const int backward_speed,
                  const float delta)
 {
-    const int speed = direction.forward ? forward_speed : backward_speed;
+    const int speed =
+        obj.get<Direction>()->forward ? forward_speed : backward_speed;
 
-    transform.location_x +=
-        cos(transform.rotation * M_PI / 180.0f) * speed * delta;
-    transform.location_y +=
-        sin(transform.rotation * M_PI / 180.0f) * speed * delta;
+    obj.get<Transform>()->location_x +=
+        cos(obj.get<Transform>()->rotation * M_PI / 180.0f) * speed * delta;
+    obj.get<Transform>()->location_y +=
+        sin(obj.get<Transform>()->rotation * M_PI / 180.0f) * speed * delta;
 
-    if (transform.location_x > 400 || transform.location_x < -400)
-        transform.location_x *= -1;
+    if (obj.get<Transform>()->location_x > 400 ||
+        obj.get<Transform>()->location_x < -400)
+        obj.get<Transform>()->location_x *= -1;
 
-    if (transform.location_y > 300 || transform.location_y < -300)
-        transform.location_y *= -1;
+    if (obj.get<Transform>()->location_y > 300 ||
+        obj.get<Transform>()->location_y < -300)
+        obj.get<Transform>()->location_y *= -1;
 }
 }
 
@@ -142,12 +146,14 @@ class Game
 public:
     Game(Window& w, Keyboard& k) : window{w}, keyboard{k}
     {
+        racket.ship.add<Transform>(&racket.transform);
+        racket.ship.add<Direction>(&racket.direction);
     }
 
     void on_pressed(const KeyboardKey key)
     {
-        rotate(key, racket.transform, rotation_step);
-        set_direction(key, racket.direction);
+        rotate(key, *racket.ship.get<Transform>(), rotation_step);
+        set_direction(key, *racket.ship.get<Direction>());
     }
 
     void on_released(const KeyboardKey)
@@ -226,8 +232,7 @@ private:
         }
         else
         {
-            move_object(racket.transform,
-                        racket.direction,
+            move_object(racket.ship,
                         racket.forward_speed,
                         racket.backward_speed,
                         delta);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+
 #include "components/Direction.hpp"
 #include "components/Transform.hpp"
 #include "keyboard.hpp"
@@ -9,15 +11,43 @@ struct health
     int value;
 };
 
+template <typename... Components>
+class TWorldObject
+{
+public:
+    template <typename Component>
+    void add(Component* c)
+    {
+        std::get<Component*>(components) = c;
+    }
+
+    template <typename Component>
+    Component* get()
+    {
+        return std::get<Component*>(components);
+    }
+
+    template <typename Component>
+    const Component* get() const
+    {
+        return std::get<Component*>(components);
+    }
+
+private:
+    std::tuple<Components*...> components;
+};
+
+using WorldObject = TWorldObject<Transform, Direction>;
+
 struct Ship
 {
     bool is_destroyed{false};
     int deaths{0};
     float color{1.0f};
     float slower{0};
-
-    Transform transform{};
+    Transform transform;
     Direction direction{Direction::Forward{true}};
+    WorldObject ship;
 
     const int forward_speed{80};
     const int backward_speed{-50};
