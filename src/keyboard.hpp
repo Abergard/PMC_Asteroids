@@ -14,8 +14,8 @@ enum class KeyboardKey
 
 enum class KeyState
 {
-    pressed,
-    unpressed
+    unpressed = 0,
+    pressed
 };
 
 struct FrameKeyState

@@ -42,41 +42,41 @@ public:
         }
     }
 
-    void updateGame(Win32Event event)
-    {
-        switch (event.message)
-        {
-        case WM_KEYDOWN:
-            switch (event.wparam)
-            {
-            case VK_LEFT:
-                racket.transform.rotation += rotation_step;
+    // void updateGame(Win32Event event)
+    // {
+    //     switch (event.message)
+    //     {
+    //     case WM_KEYDOWN:
+    //         switch (event.wparam)
+    //         {
+    //         case VK_LEFT:
+    //             racket.transform.rotation += rotation_step;
 
-                if (racket.transform.rotation > 360.0f)
-                    racket.transform.rotation -= 360.0f;
-                break;
+    //             if (racket.transform.rotation > 360.0f)
+    //                 racket.transform.rotation -= 360.0f;
+    //             break;
 
-            case VK_RIGHT:
-                if (racket.transform.rotation <= 0.0f)
-                    racket.transform.rotation = 360.0f - rotation_step;
-                else
-                    racket.transform.rotation -= rotation_step;
-                break;
+    //         case VK_RIGHT:
+    //             if (racket.transform.rotation <= 0.0f)
+    //                 racket.transform.rotation = 360.0f - rotation_step;
+    //             else
+    //                 racket.transform.rotation -= rotation_step;
+    //             break;
 
-            case VK_UP:
-                ShiftBackMode = false;
-                break;
+    //         case VK_UP:
+    //             ShiftBackMode = false;
+    //             break;
 
-            case VK_DOWN:
-                ShiftBackMode = true;
-                break;
+    //         case VK_DOWN:
+    //             ShiftBackMode = true;
+    //             break;
 
-            case VK_SPACE:
-                asteroid.RandPosition();
-                break;
-            }
-        }
-    }
+    //         case VK_SPACE:
+    //             asteroid.RandPosition();
+    //             break;
+    //         }
+    //     }
+    // }
 
 private:
     void display_surface(Window& window)
