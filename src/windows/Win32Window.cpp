@@ -63,8 +63,7 @@ Win32Window::Win32Window(const std::int32_t window_width,
 void Win32Window::handle_window_events()
 {
     MSG msg;
-
-    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);

@@ -1,20 +1,20 @@
 #pragma once
 
 #include "components/Transform.hpp"
+#include "world_object.hpp"
 
 class Asteroid
 {
 public:
-    Asteroid();
-    void RandPosition(void);
+
     void Draw(void);
     bool Update(float delta);
 
-    float my_vector{1};
-    float rotation{0};
+    float current_speed{1};
     bool IsExist{false};
 
-    const int base_speed{30};
-
     Transform transform{};
+    WorldObject object{&transform};
+
+    static const int base_speed{30};
 };

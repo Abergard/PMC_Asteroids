@@ -1,49 +1,10 @@
+#define _USE_MATH_DEFINES
+
 #include "actors/Asteroid.hpp"
 
 #include <windows.h>
 #include <gl/GLU.h>
-
-#define _USE_MATH_DEFINES
 #include <cmath>
-
-Asteroid::Asteroid()
-{
-    RandPosition();
-}
-
-void Asteroid::RandPosition(void)
-{
-    int site = rand() % 2800;
-
-    if (site < 800)
-    {
-        transform.location_x = site - 400;
-        transform.location_y = 300 + 50;
-        transform.rotation = rand() % 180 + 180;
-    }
-    else if (site < 1400)
-    {
-        transform.location_x = 400 + 50;
-        transform.location_y = site - 1100;
-        transform.rotation = rand() % 180 + 90;
-    }
-    else if (site < 2200)
-    {
-        transform.location_x = site - 1800;
-        transform.location_y = -300 - 50;
-        transform.rotation = rand() % 180;
-    }
-    else
-    {
-        transform.location_x = -400 - 50;
-        transform.location_y = site - 2500;
-        transform.rotation = rand() % 180 - 90;
-    }
-
-    int speed = base_speed * (rand() % 3 + 1);
-
-    this->my_vector = speed;
-}
 
 void Asteroid::Draw()
 {
@@ -55,7 +16,7 @@ void Asteroid::Draw()
     glRotatef(transform.rotation, 0, 0, 1);
 
     glBegin(GL_POLYGON);
-    glColor3f(1,1,1);
+    glColor3f(1, 1, 1);
     glVertex2f(+50.0f, -10.0f);
     glVertex2f(+20.0f, -50.0f);
     glVertex2f(-5.0f, -50.0f);
@@ -76,8 +37,10 @@ void Asteroid::Draw()
 
 bool Asteroid::Update(float delta)
 {
-    transform.location_x += cos(transform.rotation * M_PI / 180.0f) * my_vector * delta;
-    transform.location_y += sin(transform.rotation * M_PI / 180.0f) * my_vector * delta;
+    transform.location_x +=
+        cos(transform.rotation * M_PI / 180.0f) * current_speed * delta;
+    transform.location_y +=
+        sin(transform.rotation * M_PI / 180.0f) * current_speed * delta;
 
     if (transform.location_x > 400 + 50 || transform.location_x < -400 - 50)
         return false;

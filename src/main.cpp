@@ -9,7 +9,10 @@ KeyState get_key_state(const int wm_key_state)
     if (wm_key_state == WM_KEYDOWN)
         return KeyState::pressed;
 
-    return KeyState::unpressed;
+    if (wm_key_state == WM_KEYUP)
+        return KeyState::unpressed;
+
+    return KeyState::none;
 }
 
 KeyboardKey to_keyboard_key(const int wm_key)
@@ -46,13 +49,15 @@ try
             key != KeyboardKey::unknown)
         {
             const auto key_state = get_key_state(event.message);
-            keyboard.update(key, key_state);
 
-            if(key_state == KeyState::pressed)
+            if (key_state != KeyState::none)
+                keyboard.update(key, key_state);
+
+            if (key_state == KeyState::pressed)
             {
                 game.on_pressed(key);
             }
-            else if(key_state == KeyState::pressed)
+            else if (key_state == KeyState::pressed)
             {
                 game.on_released(key);
             }

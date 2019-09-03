@@ -7,13 +7,9 @@
 #include "keyboard.hpp"
 #include "world_object.hpp"
 
-struct health
+class Ship
 {
-    int value;
-};
-
-struct Ship
-{
+public:
     bool is_destroyed{false};
     int deaths{0};
     float color{1.0f};
@@ -22,8 +18,7 @@ struct Ship
     Direction direction{Direction::Forward{true}};
     WorldObject object{&transform, &direction};
 
-    const int forward_speed{80};
-    const int backward_speed{-50};
-    const int max_lifes{6};
-    const float rotation_step = 2.0f;
+    static const int forward_speed{80};
+    static const int backward_speed{-50};
+    inline static const float rotation_step = 2.0f;
 };

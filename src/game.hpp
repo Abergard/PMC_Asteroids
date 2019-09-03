@@ -21,6 +21,36 @@
 
 namespace
 {
+void rand_asteroid_properties(Asteroid& asteroid)
+{
+    int site = rand() % 2800;
+
+    if (site < 800)
+    {
+        asteroid.object.get<Transform>()->location_x = site - 400;
+        asteroid.object.get<Transform>()->location_y = 300 + 50;
+        asteroid.object.get<Transform>()->rotation = rand() % 180 + 180;
+    }
+    else if (site < 1400)
+    {
+        asteroid.object.get<Transform>()->location_x = 400 + 50;
+        asteroid.object.get<Transform>()->location_y = site - 1100;
+        asteroid.object.get<Transform>()->rotation = rand() % 180 + 90;
+    }
+    else if (site < 2200)
+    {
+        asteroid.object.get<Transform>()->location_x = site - 1800;
+        asteroid.object.get<Transform>()->location_y = -300 - 50;
+        asteroid.object.get<Transform>()->rotation = rand() % 180;
+    }
+    else
+    {
+        asteroid.object.get<Transform>()->location_x = -400 - 50;
+        asteroid.object.get<Transform>()->location_y = site - 2500;
+        asteroid.object.get<Transform>()->rotation = rand() % 180 - 90;
+    }
+    asteroid.current_speed = Asteroid::base_speed * (rand() % 3 + 1);
+}
 void draw(const Ship& ship)
 {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -146,13 +176,12 @@ class Game
 public:
     Game(Window& w, Keyboard& k) : window{w}, keyboard{k}
     {
-        // racket.object.add<Transform>(&racket.transform);
-        // racket.object.add<Direction>(&racket.direction);
+        rand_asteroid_properties(asteroid);
     }
 
     void on_pressed(const KeyboardKey key)
     {
-        rotate(key, *racket.object.get<Transform>(), rotation_step);
+        rotate(key, *racket.object.get<Transform>(), Ship::rotation_step);
         set_direction(key, *racket.object.get<Direction>());
     }
 
@@ -217,11 +246,15 @@ private:
     {
         if (keyboard.is(KeyboardKey::space, KeyState::pressed))
         {
-            asteroid.RandPosition();
+            // MessageBox(nullptr,
+            //            "Unexpected exception in game",
+            //            "Create Error in game",
+            //            MB_ICONEXCLAMATION);
+            rand_asteroid_properties(asteroid);
         }
 
         if (!racket.is_destroyed &&
-            is_collided(racket.transform, asteroid.transform))
+            is_collided(racket.transform, *asteroid.object.get<Transform>()))
         {
             racket.is_destroyed = true;
         }
@@ -233,8 +266,8 @@ private:
         else
         {
             move_object(racket.object,
-                        racket.forward_speed,
-                        racket.backward_speed,
+                        Ship::forward_speed,
+                        Ship::backward_speed,
                         delta);
         }
 
@@ -247,7 +280,7 @@ private:
             if (asteroidBuffer >= 2)
             {
                 asteroidBuffer = 0;
-                asteroid.RandPosition();
+                rand_asteroid_properties(asteroid);
                 IsAsteroid = true;
             }
             else
@@ -259,7 +292,6 @@ private:
 
     float asteroidBuffer = 0;
     bool IsAsteroid = false;
-    const float rotation_step = 2.0f;
     Ship racket{};
     Asteroid asteroid{};
 

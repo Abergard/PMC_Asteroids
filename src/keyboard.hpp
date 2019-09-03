@@ -14,7 +14,8 @@ enum class KeyboardKey
 
 enum class KeyState
 {
-    unpressed = 0,
+    none = -1,
+    unpressed,
     pressed
 };
 
@@ -39,7 +40,13 @@ public:
 
     void update(KeyboardKey key, KeyState state)
     {
-        get(key).changed_in_frame = get(key).state != state;
+        // if (key == KeyboardKey::space)
+        //     MessageBox(nullptr,
+        //                "Unexpected exception in keyboard",
+        //                "Create Error in keyboard",
+        //                MB_ICONEXCLAMATION);
+
+        get(key).changed_in_frame = (get(key).state != state);
         get(key).state = state;
     }
 
