@@ -7,7 +7,7 @@
 #include <cmath>
 #include <gl/GLU.h>
 
-Asteroid::Asteroid(Transform& transform) : game_object{transform}
+Asteroid::Asteroid(entity&& e) : game_object{std::move(e)}
 {
 }
 
@@ -17,10 +17,10 @@ void Asteroid::Draw()
     glPushMatrix();
 
     // only for change
-    glTranslatef(game_object.get<Transform>()->location_x,
-                 game_object.get<Transform>()->location_y,
+    glTranslatef(game_object.get<transform>()->location_x,
+                 game_object.get<transform>()->location_y,
                  0);
-    glRotatef(game_object.get<Transform>()->rotation, 0, 0, 1);
+    glRotatef(game_object.get<transform>()->rotation, 0, 0, 1);
 
     glBegin(GL_POLYGON);
     glColor3f(1, 1, 1);
@@ -44,27 +44,27 @@ void Asteroid::Draw()
 
 bool Asteroid::Update(float delta)
 {
-    game_object.get<Transform>()->location_x +=
+    game_object.get<transform>()->location_x +=
         static_cast<float>(
-            cos(game_object.get<Transform>()->rotation * M_PI / 180.0f)) *
+            cos(game_object.get<transform>()->rotation * M_PI / 180.0f)) *
         current_speed * delta;
-    game_object.get<Transform>()->location_y +=
+    game_object.get<transform>()->location_y +=
         static_cast<float>(
-            sin(game_object.get<Transform>()->rotation * M_PI / 180.0f)) *
+            sin(game_object.get<transform>()->rotation * M_PI / 180.0f)) *
         current_speed * delta;
 
-    if (game_object.get<Transform>()->location_x > 400 + 50 ||
-        game_object.get<Transform>()->location_x < -400 - 50)
+    if (game_object.get<transform>()->location_x > 400 + 50 ||
+        game_object.get<transform>()->location_x < -400 - 50)
         return false;
 
-    if (game_object.get<Transform>()->location_y > 300 + 50 ||
-        game_object.get<Transform>()->location_y < -300 - 50)
+    if (game_object.get<transform>()->location_y > 300 + 50 ||
+        game_object.get<transform>()->location_y < -300 - 50)
         return false;
 
-    game_object.get<Transform>()->rotation += 1 * delta;
+    game_object.get<transform>()->rotation += 1 * delta;
 
-    if (game_object.get<Transform>()->rotation > 360.0f)
-        game_object.get<Transform>()->rotation -= 360.0f;
+    if (game_object.get<transform>()->rotation > 360.0f)
+        game_object.get<transform>()->rotation -= 360.0f;
 
     return true;
 }

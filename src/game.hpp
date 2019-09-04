@@ -1,4 +1,4 @@
-#include "C:\Users\lzawisto\src\PMC_Asteroids\src\components\Transform.hpp"
+#include "C:\Users\lzawisto\src\PMC_Asteroids\src\components\transform.hpp"
 #pragma once
 
 #define _USE_MATH_DEFINES
@@ -27,31 +27,31 @@ void rand_asteroid_properties(Asteroid& asteroid)
 {
     int site = rand() % 2800;
 
-    auto& transform = *asteroid.game_object.get<Transform>();
+    auto& t = *asteroid.game_object.get<transform>();
 
     if (site < 800)
     {
-        transform.location_x = static_cast<float>(site - 400);
-        transform.location_y = 300 + 50;
-        transform.rotation = static_cast<float>(rand() % 180 + 180);
+        t.location_x = static_cast<float>(site - 400);
+        t.location_y = 300 + 50;
+        t.rotation = static_cast<float>(rand() % 180 + 180);
     }
     else if (site < 1400)
     {
-        transform.location_x = 400 + 50;
-        transform.location_y = static_cast<float>(site - 1100);
-        transform.rotation = static_cast<float>(rand() % 180 + 90);
+        t.location_x = 400 + 50;
+        t.location_y = static_cast<float>(site - 1100);
+        t.rotation = static_cast<float>(rand() % 180 + 90);
     }
     else if (site < 2200)
     {
-        transform.location_x = static_cast<float>(site - 1800);
-        transform.location_y = -300 - 50;
-        transform.rotation = static_cast<float>(rand() % 180);
+        t.location_x = static_cast<float>(site - 1800);
+        t.location_y = -300 - 50;
+        t.rotation = static_cast<float>(rand() % 180);
     }
     else
     {
-        transform.location_x = -400 - 50;
-        transform.location_y = static_cast<float>(site - 2500);
-        transform.rotation = static_cast<float>(rand() % 180 - 90);
+        t.location_x = -400 - 50;
+        t.location_y = static_cast<float>(site - 2500);
+        t.rotation = static_cast<float>(rand() % 180 - 90);
     }
     asteroid.current_speed =
         static_cast<float>(Asteroid::base_speed * (rand() % 3 + 1));
@@ -64,14 +64,16 @@ void draw(const Ship& ship)
     glPushMatrix();
 
     // only for change
-    glTranslatef(ship.game_object.get<Transform>()->location_x,
-                 ship.game_object.get<Transform>()->location_y,
+    glTranslatef(ship.game_object.get<transform>()->location_x,
+                 ship.game_object.get<transform>()->location_y,
                  0);
-    glRotatef(ship.game_object.get<Transform>()->rotation, 0, 0, 1);
+    glRotatef(ship.game_object.get<transform>()->rotation, 0, 0, 1);
     //
 
     glBegin(GL_POLYGON);
-    glColor3f(ship.color, ship.color, ship.color);
+    glColor3f(ship.game_object.get<color>()->rgb,
+              ship.game_object.get<color>()->rgb,
+              ship.game_object.get<color>()->rgb);
     glVertex2f(+15.0f, 0.0f);
     glVertex2f(-15.0f, -10.0f);
     glVertex2f(-5.0f, 0.0f);
@@ -85,7 +87,7 @@ void draw(const Ship& ship)
     glPopMatrix();
 }
 
-void rotate_left(Transform& transform, const float rotation_step)
+void rotate_left(transform& transform, const float rotation_step)
 {
     transform.rotation += rotation_step;
 
@@ -95,7 +97,7 @@ void rotate_left(Transform& transform, const float rotation_step)
     }
 }
 
-void rotate_right(Transform& transform, const float rotation_step)
+void rotate_right(transform& transform, const float rotation_step)
 {
     if (transform.rotation <= 0.0f)
     {
@@ -113,25 +115,25 @@ void play_death_animation(Ship& ship, const float delta)
     if (ship.slower > 0.2)
     {
         ship.is_destroyed = true;
-        if (ship.color > 0)
+        if (ship.game_object.get<color>()->rgb > 0)
         {
-            ship.color -= 0.1f;
+            ship.game_object.get<color>()->rgb -= 0.1f;
         }
         else
         {
             ship.is_destroyed = false;
-            ship.game_object.get<Transform>()->rotation = 0;
-            ship.game_object.get<Transform>()->location_x = 0;
-            ship.game_object.get<Transform>()->location_y = 0;
+            ship.game_object.get<transform>()->rotation = 0;
+            ship.game_object.get<transform>()->location_x = 0;
+            ship.game_object.get<transform>()->location_y = 0;
             ship.deaths = 0;
-            ship.color = 1.0f;
+            ship.game_object.get<color>()->rgb = 1.0f;
         }
         ship.slower = 0;
     }
 }
 
-void move_object(Transform& transform,
-                 const Direction& direction,
+void move_object(transform& transform,
+                 const direction& direction,
                  const int forward_speed,
                  const int backward_speed,
                  const float delta)
@@ -164,18 +166,18 @@ public:
         switch (key)
         {
         case KeyboardKey::left:
-            rotate_left(*racket.game_object.get<Transform>(),
+            rotate_left(*racket.game_object.get<transform>(),
                         Ship::rotation_step);
             break;
         case KeyboardKey::right:
-            rotate_right(*racket.game_object.get<Transform>(),
+            rotate_right(*racket.game_object.get<transform>(),
                          Ship::rotation_step);
             break;
         case KeyboardKey::up:
-            racket.game_object.get<Direction>()->forward = true;
+            racket.game_object.get<direction>()->forward = true;
             break;
         case KeyboardKey::down:
-            racket.game_object.get<Direction>()->forward = false;
+            racket.game_object.get<direction>()->forward = false;
             break;
         case KeyboardKey::space:
             rand_asteroid_properties(asteroid);
@@ -234,7 +236,7 @@ private:
         }
     }
 
-    bool is_collided(const Transform& first, const Transform& second)
+    bool is_collided(const transform& first, const transform& second)
     {
         const auto x = first.location_x - second.location_x;
         const auto y = first.location_y - second.location_y;
@@ -245,8 +247,8 @@ private:
     void update_logic(float delta)
     {
         if (!racket.is_destroyed &&
-            is_collided(*racket.game_object.get<Transform>(),
-                        *asteroid.game_object.get<Transform>()))
+            is_collided(*racket.game_object.get<transform>(),
+                        *asteroid.game_object.get<transform>()))
         {
             racket.is_destroyed = true;
         }
@@ -257,8 +259,8 @@ private:
         }
         else
         {
-            move_object(*racket.game_object.get<Transform>(),
-                        *racket.game_object.get<Direction>(),
+            move_object(*racket.game_object.get<transform>(),
+                        *racket.game_object.get<direction>(),
                         Ship::forward_speed,
                         Ship::backward_speed,
                         delta);
@@ -285,10 +287,11 @@ private:
 
     float asteroidBuffer = 0;
     bool IsAsteroid = false;
-    std::array<Transform, 2> transforms;
-    std::array<Direction, 1> directions;
-    Ship racket{};
-    Asteroid asteroid{transforms[1]};
+    std::array<transform, 2> transforms{};
+    std::array<direction, 1> directions{};
+    std::array<color, 1> colors{};
+    Ship racket{entity{transforms[0], directions[0], colors[0]}};
+    Asteroid asteroid{entity{transforms[1]}};
 
     Window& window;
     Keyboard& keyboard;

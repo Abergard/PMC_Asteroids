@@ -4,6 +4,7 @@
 
 #include "components/Direction.hpp"
 #include "components/Transform.hpp"
+#include "components/color.hpp"
 
 namespace detail
 {
@@ -39,4 +40,4 @@ private:
     std::tuple<Components*...> components;
 };
 }
-using entity = detail::entity<Transform, Direction>;
+using entity = detail::entity<transform, direction, color>;

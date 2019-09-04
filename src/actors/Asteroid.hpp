@@ -6,7 +6,7 @@
 class Asteroid
 {
 public:
-    Asteroid(Transform&);
+    Asteroid(entity&&);
 
     void Draw(void);
     bool Update(float delta);

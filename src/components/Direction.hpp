@@ -1,6 +1,6 @@
 #pragma once
 
-struct Direction
+struct direction
 {
     using Forward = bool;
     Forward forward;

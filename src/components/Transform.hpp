@@ -1,6 +1,6 @@
 #pragma once
 
-struct Transform
+struct transform
 {
     float location_x;
     float location_y;

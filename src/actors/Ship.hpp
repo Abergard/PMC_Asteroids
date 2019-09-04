@@ -2,22 +2,25 @@
 
 #include <tuple>
 
-#include "components/Direction.hpp"
-#include "components/Transform.hpp"
-#include "keyboard.hpp"
+#include "components/direction.hpp"
+#include "components/transform.hpp"
 #include "entity.hpp"
+#include "keyboard.hpp"
 
 class Ship
 {
 public:
+    Ship(entity&& e) : game_object{std::move(e)}
+    {
+        game_object.get<direction>()->forward = direction::Forward{true};
+        game_object.get<color>()->rgb = 1.0f;
+    }
 
     bool is_destroyed{false};
     int deaths{0};
-    float color{1.0f};
     float slower{0};
-    Transform transform;
-    Direction direction{Direction::Forward{true}};
-    entity game_object{transform, direction};
+
+    entity game_object;
 
     static const int forward_speed{80};
     static const int backward_speed{-50};
