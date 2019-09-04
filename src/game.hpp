@@ -1,4 +1,3 @@
-#include "C:\Users\lzawisto\src\PMC_Asteroids\src\components\transform.hpp"
 #pragma once
 
 #define _USE_MATH_DEFINES
