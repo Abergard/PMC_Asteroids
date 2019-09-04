@@ -1,11 +1,12 @@
 #pragma once
 
 #include "components/Transform.hpp"
-#include "world_object.hpp"
+#include "entity.hpp"
 
 class Asteroid
 {
 public:
+    Asteroid(Transform&);
 
     void Draw(void);
     bool Update(float delta);
@@ -13,8 +14,7 @@ public:
     float current_speed{1};
     bool IsExist{false};
 
-    Transform transform{};
-    WorldObject object{&transform};
+    entity game_object;
 
     static const int base_speed{30};
 };

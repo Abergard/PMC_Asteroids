@@ -45,13 +45,12 @@ try
     Game game{window, keyboard};
 
     window.subscribe([&game, &keyboard](const auto& event) {
-        if (const auto key{to_keyboard_key(event.wparam)};
-            key != KeyboardKey::unknown)
-        {
-            const auto key_state = get_key_state(event.message);
+        const auto key{to_keyboard_key(event.wparam)};
+        const auto key_state = get_key_state(event.message);
 
-            if (key_state != KeyState::none)
-                keyboard.update(key, key_state);
+        if (key != KeyboardKey::unknown && key_state != KeyState::none)
+        {
+            keyboard.update(key, key_state);
 
             if (key_state == KeyState::pressed)
             {

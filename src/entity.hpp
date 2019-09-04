@@ -2,17 +2,19 @@
 
 #include <tuple>
 
-#include "components/Transform.hpp"
 #include "components/Direction.hpp"
+#include "components/Transform.hpp"
 
+namespace detail
+{
 template <typename... Components>
-class TWorldObject
+class entity
 {
 public:
     template <typename... Args>
-    explicit TWorldObject(Args... args)
+    explicit entity(Args&... args)
     {
-        ((this->add(args)), ...);
+        ((this->add(&args)), ...);
     }
     template <typename Component>
     void add(Component* c)
@@ -24,8 +26,7 @@ public:
     Component* get()
     {
         return const_cast<Component*>(
-            static_cast<const TWorldObject<Components...>&>(*this)
-                .get<Component>());
+            static_cast<const entity<Components...>&>(*this).get<Component>());
     }
 
     template <typename Component>
@@ -37,5 +38,5 @@ public:
 private:
     std::tuple<Components*...> components;
 };
-
-using WorldObject = TWorldObject<Transform, Direction>;
+}
+using entity = detail::entity<Transform, Direction>;

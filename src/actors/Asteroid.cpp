@@ -3,8 +3,13 @@
 #include "actors/Asteroid.hpp"
 
 #include <windows.h>
-#include <gl/GLU.h>
+
 #include <cmath>
+#include <gl/GLU.h>
+
+Asteroid::Asteroid(Transform& transform) : game_object{transform}
+{
+}
 
 void Asteroid::Draw()
 {
@@ -12,8 +17,10 @@ void Asteroid::Draw()
     glPushMatrix();
 
     // only for change
-    glTranslatef(transform.location_x, transform.location_y, 0);
-    glRotatef(transform.rotation, 0, 0, 1);
+    glTranslatef(game_object.get<Transform>()->location_x,
+                 game_object.get<Transform>()->location_y,
+                 0);
+    glRotatef(game_object.get<Transform>()->rotation, 0, 0, 1);
 
     glBegin(GL_POLYGON);
     glColor3f(1, 1, 1);
@@ -37,21 +44,27 @@ void Asteroid::Draw()
 
 bool Asteroid::Update(float delta)
 {
-    transform.location_x +=
-        cos(transform.rotation * M_PI / 180.0f) * current_speed * delta;
-    transform.location_y +=
-        sin(transform.rotation * M_PI / 180.0f) * current_speed * delta;
+    game_object.get<Transform>()->location_x +=
+        static_cast<float>(
+            cos(game_object.get<Transform>()->rotation * M_PI / 180.0f)) *
+        current_speed * delta;
+    game_object.get<Transform>()->location_y +=
+        static_cast<float>(
+            sin(game_object.get<Transform>()->rotation * M_PI / 180.0f)) *
+        current_speed * delta;
 
-    if (transform.location_x > 400 + 50 || transform.location_x < -400 - 50)
+    if (game_object.get<Transform>()->location_x > 400 + 50 ||
+        game_object.get<Transform>()->location_x < -400 - 50)
         return false;
 
-    if (transform.location_y > 300 + 50 || transform.location_y < -300 - 50)
+    if (game_object.get<Transform>()->location_y > 300 + 50 ||
+        game_object.get<Transform>()->location_y < -300 - 50)
         return false;
 
-    transform.rotation += 1 * delta;
+    game_object.get<Transform>()->rotation += 1 * delta;
 
-    if (transform.rotation > 360.0f)
-        transform.rotation -= 360.0f;
+    if (game_object.get<Transform>()->rotation > 360.0f)
+        game_object.get<Transform>()->rotation -= 360.0f;
 
     return true;
 }

@@ -1,9 +1,11 @@
+#include "C:\Users\lzawisto\src\PMC_Asteroids\src\components\Transform.hpp"
 #pragma once
 
 #define _USE_MATH_DEFINES
 
 #include <windows.h>
 
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <ctime>
@@ -25,32 +27,36 @@ void rand_asteroid_properties(Asteroid& asteroid)
 {
     int site = rand() % 2800;
 
+    auto& transform = *asteroid.game_object.get<Transform>();
+
     if (site < 800)
     {
-        asteroid.object.get<Transform>()->location_x = site - 400;
-        asteroid.object.get<Transform>()->location_y = 300 + 50;
-        asteroid.object.get<Transform>()->rotation = rand() % 180 + 180;
+        transform.location_x = static_cast<float>(site - 400);
+        transform.location_y = 300 + 50;
+        transform.rotation = static_cast<float>(rand() % 180 + 180);
     }
     else if (site < 1400)
     {
-        asteroid.object.get<Transform>()->location_x = 400 + 50;
-        asteroid.object.get<Transform>()->location_y = site - 1100;
-        asteroid.object.get<Transform>()->rotation = rand() % 180 + 90;
+        transform.location_x = 400 + 50;
+        transform.location_y = static_cast<float>(site - 1100);
+        transform.rotation = static_cast<float>(rand() % 180 + 90);
     }
     else if (site < 2200)
     {
-        asteroid.object.get<Transform>()->location_x = site - 1800;
-        asteroid.object.get<Transform>()->location_y = -300 - 50;
-        asteroid.object.get<Transform>()->rotation = rand() % 180;
+        transform.location_x = static_cast<float>(site - 1800);
+        transform.location_y = -300 - 50;
+        transform.rotation = static_cast<float>(rand() % 180);
     }
     else
     {
-        asteroid.object.get<Transform>()->location_x = -400 - 50;
-        asteroid.object.get<Transform>()->location_y = site - 2500;
-        asteroid.object.get<Transform>()->rotation = rand() % 180 - 90;
+        transform.location_x = -400 - 50;
+        transform.location_y = static_cast<float>(site - 2500);
+        transform.rotation = static_cast<float>(rand() % 180 - 90);
     }
-    asteroid.current_speed = Asteroid::base_speed * (rand() % 3 + 1);
+    asteroid.current_speed =
+        static_cast<float>(Asteroid::base_speed * (rand() % 3 + 1));
 }
+
 void draw(const Ship& ship)
 {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -58,10 +64,10 @@ void draw(const Ship& ship)
     glPushMatrix();
 
     // only for change
-    glTranslatef(ship.object.get<Transform>()->location_x,
-                 ship.object.get<Transform>()->location_y,
+    glTranslatef(ship.game_object.get<Transform>()->location_x,
+                 ship.game_object.get<Transform>()->location_y,
                  0);
-    glRotatef(ship.object.get<Transform>()->rotation, 0, 0, 1);
+    glRotatef(ship.game_object.get<Transform>()->rotation, 0, 0, 1);
     //
 
     glBegin(GL_POLYGON);
@@ -101,30 +107,6 @@ void rotate_right(Transform& transform, const float rotation_step)
     }
 }
 
-void rotate(const KeyboardKey key,
-            Transform& transform,
-            const float rotation_step)
-{
-    if (key == KeyboardKey::left)
-    {
-        rotate_left(transform, rotation_step);
-    }
-    if (key == KeyboardKey::right)
-    {
-        rotate_right(transform, rotation_step);
-    }
-}
-void set_direction(const KeyboardKey key, Direction& direction)
-{
-    if (key == KeyboardKey::up)
-    {
-        direction.forward = true;
-    }
-    else if (key == KeyboardKey::down)
-    {
-        direction.forward = false;
-    }
-}
 void play_death_animation(Ship& ship, const float delta)
 {
     ship.slower += delta;
@@ -138,9 +120,9 @@ void play_death_animation(Ship& ship, const float delta)
         else
         {
             ship.is_destroyed = false;
-            ship.object.get<Transform>()->rotation = 0;
-            ship.object.get<Transform>()->location_x = 0;
-            ship.object.get<Transform>()->location_y = 0;
+            ship.game_object.get<Transform>()->rotation = 0;
+            ship.game_object.get<Transform>()->location_x = 0;
+            ship.game_object.get<Transform>()->location_y = 0;
             ship.deaths = 0;
             ship.color = 1.0f;
         }
@@ -148,26 +130,24 @@ void play_death_animation(Ship& ship, const float delta)
     }
 }
 
-void move_object(WorldObject obj,
+void move_object(Transform& transform,
+                 const Direction& direction,
                  const int forward_speed,
                  const int backward_speed,
                  const float delta)
 {
-    const int speed =
-        obj.get<Direction>()->forward ? forward_speed : backward_speed;
+    const int speed = direction.forward ? forward_speed : backward_speed;
 
-    obj.get<Transform>()->location_x +=
-        cos(obj.get<Transform>()->rotation * M_PI / 180.0f) * speed * delta;
-    obj.get<Transform>()->location_y +=
-        sin(obj.get<Transform>()->rotation * M_PI / 180.0f) * speed * delta;
+    transform.location_x +=
+        cos(transform.rotation * M_PI / 180.0f) * speed * delta;
+    transform.location_y +=
+        sin(transform.rotation * M_PI / 180.0f) * speed * delta;
 
-    if (obj.get<Transform>()->location_x > 400 ||
-        obj.get<Transform>()->location_x < -400)
-        obj.get<Transform>()->location_x *= -1;
+    if (transform.location_x > 400 || transform.location_x < -400)
+        transform.location_x *= -1;
 
-    if (obj.get<Transform>()->location_y > 300 ||
-        obj.get<Transform>()->location_y < -300)
-        obj.get<Transform>()->location_y *= -1;
+    if (transform.location_y > 300 || transform.location_y < -300)
+        transform.location_y *= -1;
 }
 }
 
@@ -181,8 +161,28 @@ public:
 
     void on_pressed(const KeyboardKey key)
     {
-        rotate(key, *racket.object.get<Transform>(), Ship::rotation_step);
-        set_direction(key, *racket.object.get<Direction>());
+        switch (key)
+        {
+        case KeyboardKey::left:
+            rotate_left(*racket.game_object.get<Transform>(),
+                        Ship::rotation_step);
+            break;
+        case KeyboardKey::right:
+            rotate_right(*racket.game_object.get<Transform>(),
+                         Ship::rotation_step);
+            break;
+        case KeyboardKey::up:
+            racket.game_object.get<Direction>()->forward = true;
+            break;
+        case KeyboardKey::down:
+            racket.game_object.get<Direction>()->forward = false;
+            break;
+        case KeyboardKey::space:
+            rand_asteroid_properties(asteroid);
+            break;
+        case KeyboardKey::unknown:
+            break;
+        }
     }
 
     void on_released(const KeyboardKey)
@@ -244,17 +244,9 @@ private:
 
     void update_logic(float delta)
     {
-        if (keyboard.is(KeyboardKey::space, KeyState::pressed))
-        {
-            // MessageBox(nullptr,
-            //            "Unexpected exception in game",
-            //            "Create Error in game",
-            //            MB_ICONEXCLAMATION);
-            rand_asteroid_properties(asteroid);
-        }
-
         if (!racket.is_destroyed &&
-            is_collided(racket.transform, *asteroid.object.get<Transform>()))
+            is_collided(*racket.game_object.get<Transform>(),
+                        *asteroid.game_object.get<Transform>()))
         {
             racket.is_destroyed = true;
         }
@@ -265,7 +257,8 @@ private:
         }
         else
         {
-            move_object(racket.object,
+            move_object(*racket.game_object.get<Transform>(),
+                        *racket.game_object.get<Direction>(),
                         Ship::forward_speed,
                         Ship::backward_speed,
                         delta);
@@ -292,8 +285,10 @@ private:
 
     float asteroidBuffer = 0;
     bool IsAsteroid = false;
+    std::array<Transform, 2> transforms;
+    std::array<Direction, 1> directions;
     Ship racket{};
-    Asteroid asteroid{};
+    Asteroid asteroid{transforms[1]};
 
     Window& window;
     Keyboard& keyboard;
