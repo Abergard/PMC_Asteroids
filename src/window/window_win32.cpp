@@ -1,4 +1,4 @@
-#include "windows/Win32Window.hpp"
+#include "window/window_win32.hpp"
 
 #include <gl/GLU.h>
 
@@ -36,6 +36,8 @@ Win32Window::Win32Window(const std::int32_t window_width,
     {
         throw std::exception("Window registration failed");
     }
+
+    RECT rect{};
 
     window_handle = CreateWindowEx(WS_EX_CLIENTEDGE,
                                    NazwaKlasy,

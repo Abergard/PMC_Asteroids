@@ -1,8 +1,6 @@
-#include <windows.h>
-
-#include "game.hpp"
-#include "keyboard.hpp"
-#include "windows/Win32Window.hpp"
+#include "world/game.hpp"
+#include "ui/keyboard.hpp"
+#include "window/window_win32.hpp"
 
 KeyState get_key_state(const int wm_key_state)
 {

@@ -5,7 +5,7 @@
 #include <functional>
 #include <iostream>
 
-#include "windows/window.hpp"
+#include "window/window.hpp"
 
 struct Win32Event
 {

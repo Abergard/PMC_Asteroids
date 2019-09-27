@@ -1,13 +1,13 @@
 #define _USE_MATH_DEFINES
 
-#include "actors/Asteroid.hpp"
+#include "actors/asteroid.hpp"
 
 #include <windows.h>
 
 #include <cmath>
 #include <gl/GLU.h>
 
-Asteroid::Asteroid(entity&& e) : game_object{std::move(e)}
+Asteroid::Asteroid(game_entity&& e) : game_object{std::move(e)}
 {
 }
 

@@ -14,11 +14,11 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "actors/Asteroid.hpp"
-#include "actors/Ship.hpp"
+#include "actors/asteroid.hpp"
+#include "actors/ship.hpp"
 #include "frame_clock.hpp"
-#include "keyboard.hpp"
-#include "windows/Win32Window.hpp"
+#include "ui/keyboard.hpp"
+#include "window/window_win32.hpp"
 
 namespace
 {
@@ -289,8 +289,9 @@ private:
     std::array<transform, 2> transforms{};
     std::array<direction, 1> directions{};
     std::array<color, 1> colors{};
-    Ship racket{entity{transforms[0], directions[0], colors[0]}};
-    Asteroid asteroid{entity{transforms[1]}};
+    Ship racket{
+        game_entity{transforms[0], directions[0], colors[0]}}; // ship logic
+    Asteroid asteroid{game_entity{transforms[1]}}; // asteroid logic
 
     Window& window;
     Keyboard& keyboard;

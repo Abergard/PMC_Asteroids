@@ -34,8 +34,8 @@ add_executable(asteroids
   src/main.cpp
 
   # actors
-  src/actors/Asteroid.cpp
-  src/windows/Win32Window.cpp
+  src/actors/asteroid.cpp
+  src/window/window_win32.cpp
 
   # window
   )

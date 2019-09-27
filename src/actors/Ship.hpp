@@ -4,13 +4,13 @@
 
 #include "components/direction.hpp"
 #include "components/transform.hpp"
-#include "entity.hpp"
-#include "keyboard.hpp"
+#include "game_entity.hpp"
+#include "ui/keyboard.hpp"
 
 class Ship
 {
 public:
-    Ship(entity&& e) : game_object{std::move(e)}
+    Ship(game_entity&& e) : game_object{std::move(e)}
     {
         game_object.get<direction>()->forward = direction::Forward{true};
         game_object.get<color>()->rgb = 1.0f;
@@ -20,7 +20,7 @@ public:
     int deaths{0};
     float slower{0};
 
-    entity game_object;
+    game_entity game_object;
 
     static const int forward_speed{80};
     static const int backward_speed{-50};
