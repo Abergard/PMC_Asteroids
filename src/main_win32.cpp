@@ -1,34 +1,36 @@
-#include "world/game.hpp"
+#define _USE_MATH_DEFINES
+
 #include "ui/keyboard.hpp"
 #include "window/window_win32.hpp"
+#include "world/game.hpp"
 
-KeyState get_key_state(const int wm_key_state)
+ui::key_state get_key_state(const int wm_key_state)
 {
     if (wm_key_state == WM_KEYDOWN)
-        return KeyState::pressed;
+        return ui::key_state::pressed;
 
     if (wm_key_state == WM_KEYUP)
-        return KeyState::unpressed;
+        return ui::key_state::unpressed;
 
-    return KeyState::none;
+    return ui::key_state::none;
 }
 
-KeyboardKey to_keyboard_key(const int wm_key)
+ui::keyboard_key to_keyboard_key(const int wm_key)
 {
     switch (wm_key)
     {
     case VK_LEFT:
-        return KeyboardKey::left;
+        return ui::keyboard_key::left;
     case VK_RIGHT:
-        return KeyboardKey::right;
+        return ui::keyboard_key::right;
     case VK_UP:
-        return KeyboardKey::up;
+        return ui::keyboard_key::up;
     case VK_DOWN:
-        return KeyboardKey::down;
+        return ui::keyboard_key::down;
     case VK_SPACE:
-        return KeyboardKey::space;
+        return ui::keyboard_key::space;
     default:
-        return KeyboardKey::unknown;
+        return ui::keyboard_key::unknown;
     }
 }
 
@@ -38,23 +40,23 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    int nCmdShow)
 try
 {
-    Keyboard keyboard;
+    ui::keyboard keyboard;
     Win32Window window{800, 600};
     Game game{window, keyboard};
 
     window.subscribe([&game, &keyboard](const auto& event) {
         const auto key{to_keyboard_key(event.wparam)};
-        const auto key_state = get_key_state(event.message);
+        const auto state = get_key_state(event.message);
 
-        if (key != KeyboardKey::unknown && key_state != KeyState::none)
+        if (key != ui::keyboard_key::unknown && state != ui::key_state::none)
         {
-            keyboard.set(key, key_state);
+            keyboard.set(key, state);
 
-            if (key_state == KeyState::pressed)
+            if (state == ui::key_state::pressed)
             {
                 game.on_pressed(key);
             }
-            else if (key_state == KeyState::pressed)
+            else if (state == ui::key_state::pressed)
             {
                 game.on_released(key);
             }

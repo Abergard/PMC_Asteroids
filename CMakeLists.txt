@@ -31,7 +31,7 @@ set(CMAKE_CXX_STANDARD 20)
 #  -Wno-extra-semi -Wno-shadow-field-in-constructor -Wno-missing-variable-declarations")
 
 add_executable(asteroids
-  src/main.cpp
+  src/main_win32.cpp
 
   # actors
   src/actors/asteroid.cpp

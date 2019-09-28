@@ -155,38 +155,38 @@ void move_object(transform& transform,
 class Game
 {
 public:
-    Game(Window& w, Keyboard& k) : window{w}, keyboard{k}
+    Game(Window& w, ui::keyboard& k) : window{w}, keyboard{k}
     {
         rand_asteroid_properties(asteroid);
     }
 
-    void on_pressed(const KeyboardKey key)
+    void on_pressed(const ui::keyboard_key key)
     {
         switch (key)
         {
-        case KeyboardKey::left:
+        case ui::keyboard_key::left:
             rotate_left(*racket.game_object.get<transform>(),
                         Ship::rotation_step);
             break;
-        case KeyboardKey::right:
+        case ui::keyboard_key::right:
             rotate_right(*racket.game_object.get<transform>(),
                          Ship::rotation_step);
             break;
-        case KeyboardKey::up:
+        case ui::keyboard_key::up:
             racket.game_object.get<direction>()->forward = true;
             break;
-        case KeyboardKey::down:
+        case ui::keyboard_key::down:
             racket.game_object.get<direction>()->forward = false;
             break;
-        case KeyboardKey::space:
+        case ui::keyboard_key::space:
             rand_asteroid_properties(asteroid);
             break;
-        case KeyboardKey::unknown:
+        case ui::keyboard_key::unknown:
             break;
         }
     }
 
-    void on_released(const KeyboardKey)
+    void on_released(const ui::keyboard_key)
     {
     }
 
@@ -294,5 +294,5 @@ private:
     Asteroid asteroid{game_entity{transforms[1]}}; // asteroid logic
 
     Window& window;
-    Keyboard& keyboard;
+    ui::keyboard& keyboard;
 };

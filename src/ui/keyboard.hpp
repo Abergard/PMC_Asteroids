@@ -2,7 +2,9 @@
 
 #include <unordered_map>
 
-enum class KeyboardKey
+namespace ui
+{
+enum class keyboard_key
 {
     unknown = -1,
     left,
@@ -12,35 +14,35 @@ enum class KeyboardKey
     space
 };
 
-enum class KeyState
+enum class key_state
 {
     none = -1,
     unpressed,
     pressed
 };
 
-struct FrameKeyState
+struct frame_key_state
 {
-    KeyState state;
+    key_state state;
     bool changed_in_frame;
 };
 
-class Keyboard
+class keyboard
 {
 public:
-    bool is(KeyboardKey key, KeyState state)
+    bool is(keyboard_key key, key_state state)
     {
         return get(key).state == state;
     }
 
-    bool has(KeyboardKey key, KeyState state)
+    bool has(keyboard_key key, key_state state)
     {
         return has_been_changed(key) && is(key, state);
     }
 
-    void set(KeyboardKey key, KeyState state)
+    void set(keyboard_key key, key_state state)
     {
-        // if (key == KeyboardKey::space)
+        // if (key == keyboard_key::space)
         //     MessageBox(nullptr,
         //                "Unexpected exception in keyboard",
         //                "Create Error in keyboard",
@@ -51,15 +53,16 @@ public:
     }
 
 private:
-    bool has_been_changed(KeyboardKey key)
+    bool has_been_changed(keyboard_key key)
     {
         return get(key).changed_in_frame;
     }
 
-    FrameKeyState& get(KeyboardKey key)
+    frame_key_state& get(keyboard_key key)
     {
-        return keyboard[key];
+        return keysFrameStates[key];
     }
 
-    std::unordered_map<KeyboardKey, FrameKeyState> keyboard{};
+    std::unordered_map<keyboard_key, frame_key_state> keysFrameStates{};
 };
+}
