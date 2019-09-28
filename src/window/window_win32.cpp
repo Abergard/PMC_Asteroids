@@ -1,16 +1,17 @@
 #include "window/window_win32.hpp"
 
 #include <gl/GLU.h>
-
-Win32Window::Win32Window(const std::int32_t window_width,
-                         const std::int32_t window_height)
+namespace window
+{
+win32_window::win32_window(const std::int32_t window_width,
+                           const std::int32_t window_height)
 {
     auto hInstance = GetModuleHandle(nullptr);
     const char* NazwaKlasy = "GL tutorial";
 
     auto wndProc =
         [](HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-            if (auto* main = reinterpret_cast<Win32Window*>(
+            if (auto* main = reinterpret_cast<win32_window*>(
                     GetWindowLongPtr(window, GWLP_USERDATA)))
             {
                 return main->realWndProc(window, message, wParam, lParam);
@@ -62,49 +63,49 @@ Win32Window::Win32Window(const std::int32_t window_width,
     enable_opengl(window_handle, &hDC, &hRC);
 }
 
-void Win32Window::handle_window_events()
+void win32_window::handle_window_events()
 {
     MSG msg;
-    while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 }
 
-bool Win32Window::is_open()
+bool win32_window::is_open()
 {
     return opened;
 }
 
-void Win32Window::swap_buffers()
+void win32_window::swap_buffers()
 {
     SwapBuffers(hDC);
 }
 
-void Win32Window::close_window(HWND hWnd)
+void win32_window::close_window(HWND hWnd)
 {
     opened = false;
     disable_opengl(hWnd, hDC, hRC);
     DestroyWindow(hWnd);
 }
 
-void Win32Window::send_close_event(HWND hWnd)
+void win32_window::send_close_event(HWND hWnd)
 {
     PostMessage(hWnd, WM_CLOSE, 0, 0);
 }
 
-void Win32Window::subscribe(Win32EventCallback callback)
+void win32_window::subscribe(win32_event_callback callback)
 {
     win32_message_callback = callback;
 }
 
-LRESULT CALLBACK Win32Window::realWndProc(HWND hWnd,
-                                          UINT message,
-                                          WPARAM wParam,
-                                          LPARAM lParam)
+LRESULT CALLBACK win32_window::realWndProc(HWND hWnd,
+                                           UINT message,
+                                           WPARAM wParam,
+                                           LPARAM lParam)
 {
-    win32_message_callback(Win32Event{message, wParam});
+    win32_message_callback(win32_event{message, wParam});
 
     switch (message)
     {
@@ -126,7 +127,7 @@ LRESULT CALLBACK Win32Window::realWndProc(HWND hWnd,
     }
 }
 
-void Win32Window::enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC)
+void win32_window::enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC)
 {
     PIXELFORMATDESCRIPTOR pfd;
     int format;
@@ -155,9 +156,10 @@ void Win32Window::enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC)
     glPointSize(2.0f);
 }
 
-void Win32Window::disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC)
+void win32_window::disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC)
 {
     wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(hRC);
     ReleaseDC(hWnd, hDC);
+}
 }

@@ -155,7 +155,7 @@ void move_object(transform& transform,
 class Game
 {
 public:
-    Game(Window& w, ui::keyboard& k) : window{w}, keyboard{k}
+    Game(window::window& w, ui::keyboard& k) : window{w}, keyboard{k}
     {
         rand_asteroid_properties(asteroid);
     }
@@ -209,7 +209,7 @@ public:
     }
 
 private:
-    void display_surface(Window& window)
+    void display_surface(window::window& window)
     {
         window.swap_buffers();
     }
@@ -293,6 +293,6 @@ private:
         game_entity{transforms[0], directions[0], colors[0]}}; // ship logic
     Asteroid asteroid{game_entity{transforms[1]}}; // asteroid logic
 
-    Window& window;
+    window::window& window;
     ui::keyboard& keyboard;
 };

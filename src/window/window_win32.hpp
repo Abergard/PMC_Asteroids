@@ -7,22 +7,25 @@
 
 #include "window/window.hpp"
 
-struct Win32Event
+namespace window
+{
+
+struct win32_event
 {
     UINT message;
     WPARAM wparam;
 };
 
-class Win32Window : public Window
+class win32_window : public window
 {
 public:
-    using Win32EventCallback = std::function<void(Win32Event)>;
+    using win32_event_callback = std::function<void(win32_event)>;
 
-    Win32Window(const std::int32_t window_width,
-                const std::int32_t window_height);
+    win32_window(const std::int32_t window_width,
+                 const std::int32_t window_height);
 
     void handle_window_events() override;
-    void subscribe(Win32EventCallback);
+    void subscribe(win32_event_callback);
     bool is_open() override;
     void swap_buffers() override;
 
@@ -36,10 +39,11 @@ private:
     void enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC);
     void disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC);
 
-    Win32EventCallback win32_message_callback = [](auto) {};
+    win32_event_callback win32_message_callback = [](auto) {};
 
     HWND window_handle{nullptr};
     HDC hDC{};
     HGLRC hRC{};
     bool opened{true};
 };
+}

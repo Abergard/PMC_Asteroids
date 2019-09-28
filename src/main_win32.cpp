@@ -41,7 +41,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 try
 {
     ui::keyboard keyboard;
-    Win32Window window{800, 600};
+    window::win32_window window{800, 600};
     Game game{window, keyboard};
 
     window.subscribe([&game, &keyboard](const auto& event) {

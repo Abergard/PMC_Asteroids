@@ -1,11 +1,14 @@
 #pragma once
 
-class Window
+namespace window
+{
+class window
 {
 public:
-    virtual ~Window() = default;
+    virtual ~window() = default;
 
     virtual void handle_window_events() = 0;
     virtual bool is_open() = 0;
-    virtual void swap_buffers()=0;
+    virtual void swap_buffers() = 0;
 };
+}
