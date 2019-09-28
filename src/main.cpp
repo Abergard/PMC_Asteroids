@@ -48,7 +48,7 @@ try
 
         if (key != KeyboardKey::unknown && key_state != KeyState::none)
         {
-            keyboard.update(key, key_state);
+            keyboard.set(key, key_state);
 
             if (key_state == KeyState::pressed)
             {

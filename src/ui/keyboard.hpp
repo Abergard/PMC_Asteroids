@@ -38,7 +38,7 @@ public:
         return has_been_changed(key) && is(key, state);
     }
 
-    void update(KeyboardKey key, KeyState state)
+    void set(KeyboardKey key, KeyState state)
     {
         // if (key == KeyboardKey::space)
         //     MessageBox(nullptr,
