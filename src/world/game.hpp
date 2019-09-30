@@ -287,18 +287,49 @@ private:
         }
     }
 
+    Ship create_racket()
+    {
+        Ship racket{};
+
+        racket.game_object =
+            game_entity{transforms[0], directions[0], colors[0], meshs[0]};
+
+        racket.game_object.get<direction>()->forward =
+            direction::Forward{true};
+        racket.game_object.get<color>()->rgb = 1.0f;
+        racket.game_object.get<mesh>()->lines = {
+            {+15.0f, 0.0f}, {-15.0f, -10.0f}, {-5.0f, 0.0f}, {-15.0f, +10.0}};
+
+        return racket;
+    }
+
+    Asteroid create_asteroid()
+    {
+        Asteroid asteroid{};
+        asteroid.game_object = game_entity{transforms[1], colors[1], meshs[1]};
+        asteroid.game_object.get<color>()->rgb = 1.0f;
+        asteroid.game_object.get<mesh>()->lines = {{+50.0f, -10.0f},
+                                                   {+20.0f, -50.0f},
+                                                   {-5.0f, -50.0f},
+                                                   {-5.0f, -25.0f},
+                                                   {-30.0f, -50.0f},
+                                                   {-50.0f, -10.0f},
+                                                   {-25.0f, 0.0f},
+                                                   {-50.0f, +10.0f},
+                                                   {-15.0f, +45.0f},
+                                                   {+20.0f, +45.0f}};
+        return asteroid;
+    }
+
     float asteroidBuffer = 0;
     bool IsAsteroid = false;
     std::array<transform, 2> transforms{};
     std::array<direction, 1> directions{};
     std::array<color, 2> colors{};
     std::array<mesh, 2> meshs{};
-    Ship racket{game_entity{transforms[0],
-                            directions[0],
-                            colors[0],
-                            meshs[0]}}; // ship logic
-    Asteroid asteroid{
-        game_entity{transforms[1], colors[1], meshs[1]}}; // asteroid logic
+
+    Ship racket{create_racket()};
+    Asteroid asteroid{create_asteroid()};
 
     ui::window& window;
     ui::keyboard& keyboard;

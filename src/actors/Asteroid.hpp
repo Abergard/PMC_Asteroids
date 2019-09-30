@@ -3,12 +3,8 @@
 #include "components/Transform.hpp"
 #include "world/game_entity.hpp"
 
-class Asteroid
+struct Asteroid
 {
-public:
-    Asteroid(game_entity&&);
-
-    void Draw(void);
     bool Update(float delta);
 
     float current_speed{1};

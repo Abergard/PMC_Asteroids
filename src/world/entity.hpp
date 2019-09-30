@@ -7,10 +7,11 @@ class entity
 {
 public:
     template <typename... Args>
-    explicit entity(Args&... args)
+    entity(Args&... args)
     {
         ((this->set(&args)), ...);
     }
+
     template <typename Component>
     void set(Component* c)
     {

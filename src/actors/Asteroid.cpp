@@ -7,21 +7,6 @@
 #include <cmath>
 #include <gl/GLU.h>
 
-Asteroid::Asteroid(game_entity&& e) : game_object{std::move(e)}
-{
-    game_object.get<color>()->rgb = 1.0f;
-    game_object.get<mesh>()->lines = {{+50.0f, -10.0f},
-                                      {+20.0f, -50.0f},
-                                      {-5.0f, -50.0f},
-                                      {-5.0f, -25.0f},
-                                      {-30.0f, -50.0f},
-                                      {-50.0f, -10.0f},
-                                      {-25.0f, 0.0f},
-                                      {-50.0f, +10.0f},
-                                      {-15.0f, +45.0f},
-                                      {+20.0f, +45.0f}};
-}
-
 bool Asteroid::Update(float delta)
 {
     game_object.get<transform>()->location_x +=

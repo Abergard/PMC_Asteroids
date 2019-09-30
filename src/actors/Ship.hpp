@@ -7,17 +7,8 @@
 #include "game_entity.hpp"
 #include "ui/keyboard.hpp"
 
-class Ship
+struct Ship
 {
-public:
-    Ship(game_entity&& e) : game_object{std::move(e)}
-    {
-        game_object.get<direction>()->forward = direction::Forward{true};
-        game_object.get<color>()->rgb = 1.0f;
-        game_object.get<mesh>()->lines = {
-            {+15.0f, 0.0f}, {-15.0f, -10.0f}, {-5.0f, 0.0f}, {-15.0f, +10.0}};
-    }
-
     bool is_destroyed{false};
     int deaths{0};
     float slower{0};
