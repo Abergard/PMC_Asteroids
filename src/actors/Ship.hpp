@@ -14,6 +14,8 @@ public:
     {
         game_object.get<direction>()->forward = direction::Forward{true};
         game_object.get<color>()->rgb = 1.0f;
+        game_object.get<mesh>()->lines = {
+            {+15.0f, 0.0f}, {-15.0f, -10.0f}, {-5.0f, 0.0f}, {-15.0f, +10.0}};
     }
 
     bool is_destroyed{false};
