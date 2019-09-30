@@ -56,23 +56,56 @@ void rand_asteroid_properties(Asteroid& asteroid)
         static_cast<float>(Asteroid::base_speed * (rand() % 3 + 1));
 }
 
-void draw(const Ship& ship)
+void draw1(const game_entity& game_object)
 {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     glPushMatrix();
 
     // only for change
-    glTranslatef(ship.game_object.get<transform>()->location_x,
-                 ship.game_object.get<transform>()->location_y,
+    glTranslatef(game_object.get<transform>()->location_x,
+                 game_object.get<transform>()->location_y,
                  0);
-    glRotatef(ship.game_object.get<transform>()->rotation, 0, 0, 1);
+    glRotatef(game_object.get<transform>()->rotation, 0, 0, 1);
+
+    glBegin(GL_POLYGON);
+
+    glColor3f(game_object.get<color>()->rgb,
+              game_object.get<color>()->rgb,
+              game_object.get<color>()->rgb);
+    glVertex2f(+50.0f, -10.0f);
+    glVertex2f(+20.0f, -50.0f);
+    glVertex2f(-5.0f, -50.0f);
+    glVertex2f(-5.0f, -25.0f);
+    glVertex2f(-30.0f, -50.0f);
+    glVertex2f(-50.0f, -10.0f);
+    glVertex2f(-25.0f, 0.0f);
+    glVertex2f(-50.0f, +10.0f);
+    glVertex2f(-15.0f, +45.0f);
+    glVertex2f(+20.0f, +45.0f);
+    glEnd();
+
+    glBegin(GL_POINTS);
+    glVertex2f(0.0f, 0.0f);
+    glEnd();
+    glPopMatrix();
+}
+
+void draw2(const game_entity& game_object)
+{
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPushMatrix();
+
+    // only for change
+    glTranslatef(game_object.get<transform>()->location_x,
+                 game_object.get<transform>()->location_y,
+                 0);
+    glRotatef(game_object.get<transform>()->rotation, 0, 0, 1);
     //
 
     glBegin(GL_POLYGON);
-    glColor3f(ship.game_object.get<color>()->rgb,
-              ship.game_object.get<color>()->rgb,
-              ship.game_object.get<color>()->rgb);
+    glColor3f(game_object.get<color>()->rgb,
+              game_object.get<color>()->rgb,
+              game_object.get<color>()->rgb);
     glVertex2f(+15.0f, 0.0f);
     glVertex2f(-15.0f, -10.0f);
     glVertex2f(-5.0f, 0.0f);
@@ -227,11 +260,11 @@ private:
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        draw(racket);
+        draw2(racket.game_object);
 
         if (IsAsteroid == true)
         {
-            asteroid.Draw();
+            draw1(asteroid.game_object);
         }
     }
 
@@ -288,10 +321,10 @@ private:
     bool IsAsteroid = false;
     std::array<transform, 2> transforms{};
     std::array<direction, 1> directions{};
-    std::array<color, 1> colors{};
+    std::array<color, 2> colors{};
     Ship racket{
         game_entity{transforms[0], directions[0], colors[0]}}; // ship logic
-    Asteroid asteroid{game_entity{transforms[1]}}; // asteroid logic
+    Asteroid asteroid{game_entity{transforms[1], colors[1]}}; // asteroid logic
 
     ui::window& window;
     ui::keyboard& keyboard;
