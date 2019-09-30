@@ -10,7 +10,7 @@
 #include <ctime>
 #include <exception>
 #include <functional>
-#include <gl\GLU.h>
+#include <gl/GLU.h>
 #include <iostream>
 #include <stdlib.h>
 
@@ -18,7 +18,7 @@
 #include "actors/ship.hpp"
 #include "frame_clock.hpp"
 #include "ui/keyboard.hpp"
-#include "window/window_win32.hpp"
+#include "ui/window_win32.hpp"
 
 namespace
 {
@@ -155,7 +155,7 @@ void move_object(transform& transform,
 class Game
 {
 public:
-    Game(window::window& w, ui::keyboard& k) : window{w}, keyboard{k}
+    Game(ui::window& w, ui::keyboard& k) : window{w}, keyboard{k}
     {
         rand_asteroid_properties(asteroid);
     }
@@ -209,7 +209,7 @@ public:
     }
 
 private:
-    void display_surface(window::window& window)
+    void display_surface(ui::window& window)
     {
         window.swap_buffers();
     }
@@ -293,6 +293,6 @@ private:
         game_entity{transforms[0], directions[0], colors[0]}}; // ship logic
     Asteroid asteroid{game_entity{transforms[1]}}; // asteroid logic
 
-    window::window& window;
+    ui::window& window;
     ui::keyboard& keyboard;
 };

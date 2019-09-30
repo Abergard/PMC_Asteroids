@@ -1,7 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "ui/keyboard.hpp"
-#include "window/window_win32.hpp"
+#include "ui/window_win32.hpp"
 #include "world/game.hpp"
 
 ui::key_state get_key_state(const int wm_key_state)
@@ -41,7 +41,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 try
 {
     ui::keyboard keyboard;
-    window::win32_window window{800, 600};
+    ui::win32_window window{800, 600};
     Game game{window, keyboard};
 
     window.subscribe([&game, &keyboard](const auto& event) {

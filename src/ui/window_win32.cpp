@@ -1,7 +1,8 @@
-#include "window/window_win32.hpp"
+#include "ui/window_win32.hpp"
 
 #include <gl/GLU.h>
-namespace window
+
+namespace ui
 {
 win32_window::win32_window(const std::int32_t window_width,
                            const std::int32_t window_height)

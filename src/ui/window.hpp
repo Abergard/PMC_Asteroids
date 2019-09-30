@@ -1,6 +1,6 @@
 #pragma once
 
-namespace window
+namespace ui
 {
 class window
 {

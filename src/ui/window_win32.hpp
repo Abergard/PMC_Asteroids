@@ -5,9 +5,9 @@
 #include <functional>
 #include <iostream>
 
-#include "window/window.hpp"
+#include "ui/window.hpp"
 
-namespace window
+namespace ui
 {
 
 struct win32_event
