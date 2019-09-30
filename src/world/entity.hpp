@@ -9,10 +9,10 @@ public:
     template <typename... Args>
     explicit entity(Args&... args)
     {
-        ((this->add(&args)), ...);
+        ((this->set(&args)), ...);
     }
     template <typename Component>
-    void add(Component* c)
+    void set(Component* c)
     {
         std::get<Component*>(components) = c;
     }
