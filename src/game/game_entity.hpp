@@ -6,6 +6,4 @@
 #include "components/transform.hpp"
 #include "world/entity.hpp"
 
-struct game_entity : entity<transform, direction, color, mesh>
-{
-};
+using game_entity = entity<transform, direction, color, mesh>;

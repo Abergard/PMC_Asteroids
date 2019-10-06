@@ -9,7 +9,7 @@ public:
     template <typename... Args>
     entity(Args&... args)
     {
-        ((this->set(&args)), ...);
+        (this->set(&args), ...);
     }
 
     template <typename Component>

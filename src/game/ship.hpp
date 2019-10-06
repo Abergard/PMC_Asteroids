@@ -9,10 +9,6 @@
 
 struct Ship
 {
-    bool is_destroyed{false};
-    int deaths{0};
-    float slower{0};
-
     game_entity game_object;
 
     static const int forward_speed{80};
