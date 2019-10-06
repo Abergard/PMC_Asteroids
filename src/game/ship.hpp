@@ -4,7 +4,7 @@
 
 #include "components/direction.hpp"
 #include "components/transform.hpp"
-#include "game_entity.hpp"
+#include "game/game_entity.hpp"
 #include "ui/keyboard.hpp"
 
 struct Ship

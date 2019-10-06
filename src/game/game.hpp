@@ -14,11 +14,11 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "actors/asteroid.hpp"
-#include "actors/ship.hpp"
-#include "frame_clock.hpp"
+#include "game/asteroid.hpp"
+#include "game/ship.hpp"
 #include "ui/keyboard.hpp"
 #include "ui/window_win32.hpp"
+#include "world/frame_clock.hpp"
 
 namespace
 {
@@ -134,24 +134,20 @@ void play_death_animation(Ship& ship, const float delta)
     }
 }
 
-void move_object(transform& transform,
-                 const direction& direction,
-                 const int forward_speed,
-                 const int backward_speed,
+void move_object(transform& local_transform,
+                 const int move_speed,
+                 const int rotation_speed,
                  const float delta)
 {
-    const int speed = direction.forward ? forward_speed : backward_speed;
+    local_transform.location_x +=
+        cos(local_transform.rotation * M_PI / 180.0f) * move_speed * delta;
+    local_transform.location_y +=
+        sin(local_transform.rotation * M_PI / 180.0f) * move_speed * delta;
 
-    transform.location_x +=
-        cos(transform.rotation * M_PI / 180.0f) * speed * delta;
-    transform.location_y +=
-        sin(transform.rotation * M_PI / 180.0f) * speed * delta;
+    local_transform.rotation += rotation_speed * delta;
 
-    if (transform.location_x > 400 || transform.location_x < -400)
-        transform.location_x *= -1;
-
-    if (transform.location_y > 300 || transform.location_y < -300)
-        transform.location_y *= -1;
+    if (local_transform.rotation > 360.0f)
+        local_transform.rotation -= 360.0f;
 }
 }
 
@@ -232,7 +228,7 @@ private:
 
         draw(racket.game_object);
 
-        if (IsAsteroid == true)
+        if (asteroid_visible)
         {
             draw(asteroid.game_object);
         }
@@ -244,6 +240,19 @@ private:
         const auto y = first.location_y - second.location_y;
         const auto distance = sqrt((x * x) + (y * y));
         return distance < 54.0f;
+    }
+
+    bool is_asteroid_visible()
+    {
+        if (!asteroid_visible ||
+            asteroid.game_object.get<transform>()->location_x > 400 + 50 ||
+            asteroid.game_object.get<transform>()->location_x < -400 - 50 ||
+            asteroid.game_object.get<transform>()->location_y > 300 + 50 ||
+            asteroid.game_object.get<transform>()->location_y < -300 - 50)
+        {
+            return false;
+        }
+        return true;
     }
 
     void update_logic(float delta)
@@ -261,16 +270,30 @@ private:
         }
         else
         {
-            move_object(*racket.game_object.get<transform>(),
-                        *racket.game_object.get<direction>(),
-                        Ship::forward_speed,
-                        Ship::backward_speed,
-                        delta);
+            const int move_speed =
+                racket.game_object.get<direction>()->forward ?
+                    Ship::forward_speed :
+                    Ship::backward_speed;
+            auto rotation_speed = 0;
+
+            auto& local_transform = *racket.game_object.get<transform>();
+            move_object(local_transform, move_speed, rotation_speed, delta);
+
+            if (local_transform.location_x > 400 ||
+                local_transform.location_x < -400)
+                local_transform.location_x *= -1;
+
+            if (local_transform.location_y > 300 ||
+                local_transform.location_y < -300)
+                local_transform.location_y *= -1;
         }
 
-        if (IsAsteroid)
+        if (asteroid_visible = is_asteroid_visible())
         {
-            IsAsteroid = asteroid.Update(delta);
+            move_object(*asteroid.game_object.get<transform>(),
+                        asteroid.current_speed,
+                        1,
+                        delta);
         }
         else
         {
@@ -278,7 +301,7 @@ private:
             {
                 asteroidBuffer = 0;
                 rand_asteroid_properties(asteroid);
-                IsAsteroid = true;
+                asteroid_visible = true;
             }
             else
             {
@@ -300,6 +323,8 @@ private:
         racket.game_object.get<mesh>()->lines = {
             {+15.0f, 0.0f}, {-15.0f, -10.0f}, {-5.0f, 0.0f}, {-15.0f, +10.0}};
 
+        // racket.game_object.visible = true;
+
         return racket;
     }
 
@@ -318,11 +343,13 @@ private:
                                                    {-50.0f, +10.0f},
                                                    {-15.0f, +45.0f},
                                                    {+20.0f, +45.0f}};
+
+        // asteroid.game_object.visible = false;
+
         return asteroid;
     }
 
     float asteroidBuffer = 0;
-    bool IsAsteroid = false;
     std::array<transform, 2> transforms{};
     std::array<direction, 1> directions{};
     std::array<color, 2> colors{};
@@ -330,6 +357,9 @@ private:
 
     Ship racket{create_racket()};
     Asteroid asteroid{create_asteroid()};
+
+    // bool is_asteroid_visible{false};
+    bool asteroid_visible{false};
 
     ui::window& window;
     ui::keyboard& keyboard;

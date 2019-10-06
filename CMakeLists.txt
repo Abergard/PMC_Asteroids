@@ -32,12 +32,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(asteroids
   src/main_win32.cpp
-
-  # actors
-  src/actors/asteroid.cpp
   src/ui/window_win32.cpp
-
-  # window
   )
 
 target_include_directories(asteroids PRIVATE

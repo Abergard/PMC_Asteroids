@@ -2,7 +2,7 @@
 
 #include "ui/keyboard.hpp"
 #include "ui/window_win32.hpp"
-#include "world/game.hpp"
+#include "game/game.hpp"
 
 ui::key_state get_key_state(const int wm_key_state)
 {
