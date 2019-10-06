@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+namespace world
+{
 class frame_clock
 {
 public:
@@ -17,3 +19,4 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> previous_frame{
         std::chrono::high_resolution_clock::now()};
 };
+}

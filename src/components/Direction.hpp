@@ -1,7 +1,10 @@
 #pragma once
 
+namespace component
+{
 struct direction
 {
-    using Forward = bool;
-    Forward forward;
+    using forward = bool;
+    forward is_forward;
 };
+}

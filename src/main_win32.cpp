@@ -1,8 +1,8 @@
 #define _USE_MATH_DEFINES
 
+#include "game/asteroid_game.hpp"
 #include "ui/keyboard.hpp"
 #include "ui/window_win32.hpp"
-#include "game/game.hpp"
 
 ui::key_state get_key_state(const int wm_key_state)
 {
@@ -42,7 +42,7 @@ try
 {
     ui::keyboard keyboard;
     ui::win32_window window{800, 600};
-    Game game{window, keyboard};
+    asteroid_game game{window, keyboard};
 
     window.subscribe([&game, &keyboard](const auto& event) {
         const auto key{to_keyboard_key(event.wparam)};

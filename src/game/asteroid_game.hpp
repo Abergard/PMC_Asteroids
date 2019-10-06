@@ -20,10 +20,10 @@
 #include "ui/window_win32.hpp"
 #include "world/frame_clock.hpp"
 
-class Game
+class asteroid_game
 {
 public:
-    Game(ui::window& w, ui::keyboard& k);
+    asteroid_game(ui::window& w, ui::keyboard& k);
 
     void on_pressed(const ui::keyboard_key key);
     void on_released(const ui::keyboard_key);
@@ -35,10 +35,10 @@ private:
     void play_death_animation(Ship&, float delta);
 
     float asteroidBuffer = 0;
-    std::vector<transform> transforms{};
-    std::vector<direction> directions{};
-    std::vector<color> colors{};
-    std::vector<mesh> meshs{};
+    std::vector<component::transform> transforms{};
+    std::vector<component::direction> directions{};
+    std::vector<component::color> colors{};
+    std::vector<component::mesh> meshs{};
 
     Ship racket{};
     bool ship_destroyed{false};

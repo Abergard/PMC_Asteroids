@@ -34,7 +34,7 @@ add_executable(asteroids
   src/main_win32.cpp
   src/ui/window_win32.cpp
   src/ui/keyboard.cpp
-  src/game/game.cpp
+  src/game/asteroid_game.cpp
   )
 
 target_include_directories(asteroids PRIVATE

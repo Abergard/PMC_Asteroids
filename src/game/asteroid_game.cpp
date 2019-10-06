@@ -1,10 +1,10 @@
-#include "game/game.hpp"
+#include "game/asteroid_game.hpp"
 
 static void rand_asteroid_properties(Asteroid& asteroid)
 {
     int site = rand() % 2800;
 
-    auto& t = *asteroid.game_object.get<transform>();
+    auto& t = *asteroid.game_object.get<component::transform>();
 
     if (site < 800)
     {
@@ -34,9 +34,9 @@ static void rand_asteroid_properties(Asteroid& asteroid)
         static_cast<float>(Asteroid::base_speed * (rand() % 3 + 1));
 }
 
-static Asteroid create_asteroid(transform& asteroid_transform,
-                                color& asteroid_color,
-                                mesh& asteroid_mesh)
+static Asteroid create_asteroid(component::transform& asteroid_transform,
+                                component::color& asteroid_color,
+                                component::mesh& asteroid_mesh)
 {
 
     asteroid_color.rgb = 1.0f;
@@ -56,12 +56,12 @@ static Asteroid create_asteroid(transform& asteroid_transform,
     return asteroid;
 }
 
-static Ship create_racket(transform& racket_transform,
-                          direction& racket_direction,
-                          color& racket_color,
-                          mesh& racket_mesh)
+static Ship create_racket(component::transform& racket_transform,
+                          component::direction& racket_direction,
+                          component::color& racket_color,
+                          component::mesh& racket_mesh)
 {
-    racket_direction.forward = direction::Forward{true};
+    racket_direction.is_forward = component::direction::forward{true};
     racket_color.rgb = 1.0f;
     racket_mesh.lines = {
         {+15.0f, 0.0f}, {-15.0f, -10.0f}, {-5.0f, 0.0f}, {-15.0f, +10.0}};
@@ -78,7 +78,8 @@ static void reserve_memory(const std::size_t size, Args&... args)
     (args.reserve(size), ...);
 }
 
-Game::Game(ui::window& w, ui::keyboard& k) : window{w}, keyboard{k}
+asteroid_game::asteroid_game(ui::window& w, ui::keyboard& k)
+    : window{w}, keyboard{k}
 {
     reserve_memory(2, transforms, directions, colors, meshs);
     racket = create_racket(transforms.emplace_back(),
@@ -91,44 +92,47 @@ Game::Game(ui::window& w, ui::keyboard& k) : window{w}, keyboard{k}
     rand_asteroid_properties(asteroid);
 }
 
-static void rotate_left(transform& transform, const float rotation_step)
+static void rotate_left(component::transform& local_transform,
+                        const float rotation_step)
 {
-    transform.rotation += rotation_step;
+    local_transform.rotation += rotation_step;
 
-    if (transform.rotation > 360.0f)
+    if (local_transform.rotation > 360.0f)
     {
-        transform.rotation -= 360.0f;
+        local_transform.rotation -= 360.0f;
     }
 }
 
-static void rotate_right(transform& transform, const float rotation_step)
+static void rotate_right(component::transform& local_transform,
+                         const float rotation_step)
 {
-    if (transform.rotation <= 0.0f)
+    if (local_transform.rotation <= 0.0f)
     {
-        transform.rotation = 360.0f - rotation_step;
+        local_transform.rotation = 360.0f - rotation_step;
     }
     else
     {
-        transform.rotation -= rotation_step;
+        local_transform.rotation -= rotation_step;
     }
 }
 
-void Game::on_pressed(const ui::keyboard_key key)
+void asteroid_game::on_pressed(const ui::keyboard_key key)
 {
     switch (key)
     {
     case ui::keyboard_key::left:
-        rotate_left(*racket.game_object.get<transform>(), Ship::rotation_step);
+        rotate_left(*racket.game_object.get<component::transform>(),
+                    Ship::rotation_step);
         break;
     case ui::keyboard_key::right:
-        rotate_right(*racket.game_object.get<transform>(),
+        rotate_right(*racket.game_object.get<component::transform>(),
                      Ship::rotation_step);
         break;
     case ui::keyboard_key::up:
-        racket.game_object.get<direction>()->forward = true;
+        racket.game_object.get<component::direction>()->is_forward = true;
         break;
     case ui::keyboard_key::down:
-        racket.game_object.get<direction>()->forward = false;
+        racket.game_object.get<component::direction>()->is_forward = false;
         break;
     case ui::keyboard_key::space:
         rand_asteroid_properties(asteroid);
@@ -138,13 +142,13 @@ void Game::on_pressed(const ui::keyboard_key key)
     }
 }
 
-void Game::on_released(const ui::keyboard_key)
+void asteroid_game::on_released(const ui::keyboard_key)
 {
 }
 
-void Game::run()
+void asteroid_game::run()
 {
-    frame_clock clock{};
+    world::frame_clock clock{};
 
     while (window.is_open())
     {
@@ -160,19 +164,19 @@ static void draw(const game_entity& game_object)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPushMatrix();
 
-    if (const auto* local_transform = game_object.get<transform>())
+    if (const auto* local_transform = game_object.get<component::transform>())
     {
         glTranslatef(
             local_transform->location_x, local_transform->location_y, 0);
         glRotatef(local_transform->rotation, 0, 0, 1);
     }
 
-    if (const auto* object_color = game_object.get<color>())
+    if (const auto* object_color = game_object.get<component::color>())
     {
         glColor3f(object_color->rgb, object_color->rgb, object_color->rgb);
     }
 
-    if (const auto* object_mesh = game_object.get<mesh>())
+    if (const auto* object_mesh = game_object.get<component::mesh>())
     {
         glBegin(GL_POLYGON);
         for (const auto& point : object_mesh->lines)
@@ -188,7 +192,7 @@ static void draw(const game_entity& game_object)
     glPopMatrix();
 }
 
-void Game::render_game()
+void asteroid_game::render_game()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -211,17 +215,17 @@ void Game::render_game()
 
 static bool is_object_visible(const game_entity& game_object)
 {
-    if (game_object.get<transform>()->location_x > 400 + 50 ||
-        game_object.get<transform>()->location_x < -400 - 50 ||
-        game_object.get<transform>()->location_y > 300 + 50 ||
-        game_object.get<transform>()->location_y < -300 - 50)
+    if (game_object.get<component::transform>()->location_x > 400 + 50 ||
+        game_object.get<component::transform>()->location_x < -400 - 50 ||
+        game_object.get<component::transform>()->location_y > 300 + 50 ||
+        game_object.get<component::transform>()->location_y < -300 - 50)
     {
         return false;
     }
     return true;
 }
 
-static void move_object(transform& local_transform,
+static void move_object(component::transform& local_transform,
                         const int move_speed,
                         const int rotation_speed,
                         const float delta)
@@ -237,23 +241,23 @@ static void move_object(transform& local_transform,
         local_transform.rotation -= 360.0f;
 }
 
-void Game::play_death_animation(Ship& ship, const float delta)
+void asteroid_game::play_death_animation(Ship& ship, const float delta)
 {
     ship_slower += delta;
     if (ship_slower > 0.2)
     {
         ship_destroyed = true;
-        if (ship.game_object.get<color>()->rgb > 0)
+        if (ship.game_object.get<component::color>()->rgb > 0)
         {
-            ship.game_object.get<color>()->rgb -= 0.1f;
+            ship.game_object.get<component::color>()->rgb -= 0.1f;
         }
         else
         {
             ship_destroyed = false;
-            ship.game_object.get<transform>()->rotation = 0;
-            ship.game_object.get<transform>()->location_x = 0;
-            ship.game_object.get<transform>()->location_y = 0;
-            ship.game_object.get<color>()->rgb = 1.0f;
+            ship.game_object.get<component::transform>()->rotation = 0;
+            ship.game_object.get<component::transform>()->location_x = 0;
+            ship.game_object.get<component::transform>()->location_y = 0;
+            ship.game_object.get<component::color>()->rgb = 1.0f;
             ship_deaths = 0;
         }
         ship_slower = 0;
@@ -261,7 +265,8 @@ void Game::play_death_animation(Ship& ship, const float delta)
 }
 
 // TODO: move to collision system
-static bool is_collided(const transform& first, const transform& second)
+static bool is_collided(const component::transform& first,
+                        const component::transform& second)
 {
     const auto x = first.location_x - second.location_x;
     const auto y = first.location_y - second.location_y;
@@ -269,10 +274,11 @@ static bool is_collided(const transform& first, const transform& second)
     return distance < 54.0f;
 }
 
-void Game::update_game_logic(float delta)
+void asteroid_game::update_game_logic(float delta)
 {
-    if (!ship_destroyed && is_collided(*racket.game_object.get<transform>(),
-                                       *asteroid.game_object.get<transform>()))
+    if (!ship_destroyed &&
+        is_collided(*racket.game_object.get<component::transform>(),
+                    *asteroid.game_object.get<component::transform>()))
     {
         ship_destroyed = true;
     }
@@ -283,12 +289,14 @@ void Game::update_game_logic(float delta)
     }
     else
     {
-        const int move_speed = racket.game_object.get<direction>()->forward ?
-                                   Ship::forward_speed :
-                                   Ship::backward_speed;
+        const int move_speed =
+            racket.game_object.get<component::direction>()->is_forward ?
+                Ship::forward_speed :
+                Ship::backward_speed;
         auto rotation_speed = 0;
 
-        auto& local_transform = *racket.game_object.get<transform>();
+        auto& local_transform =
+            *racket.game_object.get<component::transform>();
         move_object(local_transform, move_speed, rotation_speed, delta);
 
         if (local_transform.location_x > 400 ||
@@ -302,7 +310,7 @@ void Game::update_game_logic(float delta)
 
     if (asteroid_visible = is_object_visible(asteroid.game_object))
     {
-        move_object(*asteroid.game_object.get<transform>(),
+        move_object(*asteroid.game_object.get<component::transform>(),
                     asteroid.current_speed,
                     1,
                     delta);

@@ -2,6 +2,8 @@
 
 #include <tuple>
 
+namespace world
+{
 template <typename... Components>
 class entity
 {
@@ -34,3 +36,4 @@ public:
 private:
     std::tuple<Components*...> components;
 };
+}
