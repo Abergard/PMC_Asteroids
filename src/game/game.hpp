@@ -30,8 +30,8 @@ public:
     void run();
 
 private:
-    void update_surface();
-    void update_logic(float delta);
+    void render_game();
+    void update_game_logic(float delta);
     void play_death_animation(Ship&, float delta);
 
     float asteroidBuffer = 0;

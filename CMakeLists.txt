@@ -33,6 +33,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(asteroids
   src/main_win32.cpp
   src/ui/window_win32.cpp
+  src/ui/keyboard.cpp
   src/game/game.cpp
   )
 

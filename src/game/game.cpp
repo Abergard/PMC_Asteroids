@@ -144,18 +144,13 @@ void Game::on_released(const ui::keyboard_key)
 
 void Game::run()
 {
-    FrameClock frame_clock;
+    frame_clock clock{};
 
     while (window.is_open())
     {
-        // read input
-        window.handle_window_events();
-
-        // update game logic
-        update_logic(frame_clock.calculate_delta());
-
-        // render surface
-        update_surface();
+        window.read_events();
+        update_game_logic(clock.delta());
+        render_game();
         window.swap_buffers();
     }
 }
@@ -193,7 +188,7 @@ static void draw(const game_entity& game_object)
     glPopMatrix();
 }
 
-void Game::update_surface()
+void Game::render_game()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -265,6 +260,7 @@ void Game::play_death_animation(Ship& ship, const float delta)
     }
 }
 
+// TODO: move to collision system
 static bool is_collided(const transform& first, const transform& second)
 {
     const auto x = first.location_x - second.location_x;
@@ -273,7 +269,7 @@ static bool is_collided(const transform& first, const transform& second)
     return distance < 54.0f;
 }
 
-void Game::update_logic(float delta)
+void Game::update_game_logic(float delta)
 {
     if (!ship_destroyed && is_collided(*racket.game_object.get<transform>(),
                                        *asteroid.game_object.get<transform>()))

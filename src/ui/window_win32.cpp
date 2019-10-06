@@ -4,6 +4,36 @@
 
 namespace ui
 {
+
+static void enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC)
+{
+    PIXELFORMATDESCRIPTOR pfd;
+    int format;
+
+    // get the device context (DC)
+    *hDC = GetDC(hWnd);
+
+    // set the pixel format for the DC
+    ZeroMemory(&pfd, sizeof(pfd));
+
+    pfd.nSize = sizeof(pfd);
+    pfd.nVersion = 1;
+    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+    pfd.iPixelType = PFD_TYPE_RGBA;
+    pfd.cColorBits = 24;
+    pfd.cDepthBits = 16;
+    pfd.iLayerType = PFD_MAIN_PLANE;
+
+    format = ChoosePixelFormat(*hDC, &pfd);
+    SetPixelFormat(*hDC, format, &pfd);
+
+    // create and enable the render context (RC)
+    *hRC = wglCreateContext(*hDC);
+    wglMakeCurrent(*hDC, *hRC);
+
+    glPointSize(2.0f);
+}
+
 win32_window::win32_window(const std::int32_t window_width,
                            const std::int32_t window_height)
 {
@@ -64,7 +94,7 @@ win32_window::win32_window(const std::int32_t window_width,
     enable_opengl(window_handle, &hDC, &hRC);
 }
 
-void win32_window::handle_window_events()
+void win32_window::read_events()
 {
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -84,16 +114,23 @@ void win32_window::swap_buffers()
     SwapBuffers(hDC);
 }
 
+static void send_close_event(HWND hWnd)
+{
+    PostMessage(hWnd, WM_CLOSE, 0, 0);
+}
+
+static void disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC)
+{
+    wglMakeCurrent(nullptr, nullptr);
+    wglDeleteContext(hRC);
+    ReleaseDC(hWnd, hDC);
+}
+
 void win32_window::close_window(HWND hWnd)
 {
     opened = false;
     disable_opengl(hWnd, hDC, hRC);
     DestroyWindow(hWnd);
-}
-
-void win32_window::send_close_event(HWND hWnd)
-{
-    PostMessage(hWnd, WM_CLOSE, 0, 0);
 }
 
 void win32_window::subscribe(win32_event_callback callback)
@@ -126,41 +163,5 @@ LRESULT CALLBACK win32_window::realWndProc(HWND hWnd,
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-}
-
-void win32_window::enable_opengl(HWND hWnd, HDC* hDC, HGLRC* hRC)
-{
-    PIXELFORMATDESCRIPTOR pfd;
-    int format;
-
-    // get the device context (DC)
-    *hDC = GetDC(hWnd);
-
-    // set the pixel format for the DC
-    ZeroMemory(&pfd, sizeof(pfd));
-
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 16;
-    pfd.iLayerType = PFD_MAIN_PLANE;
-
-    format = ChoosePixelFormat(*hDC, &pfd);
-    SetPixelFormat(*hDC, format, &pfd);
-
-    // create and enable the render context (RC)
-    *hRC = wglCreateContext(*hDC);
-    wglMakeCurrent(*hDC, *hRC);
-
-    glPointSize(2.0f);
-}
-
-void win32_window::disable_opengl(HWND hWnd, HDC hDC, HGLRC hRC)
-{
-    wglMakeCurrent(nullptr, nullptr);
-    wglDeleteContext(hRC);
-    ReleaseDC(hWnd, hDC);
 }
 }

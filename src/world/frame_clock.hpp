@@ -2,10 +2,10 @@
 
 #include <chrono>
 
-class FrameClock
+class frame_clock
 {
 public:
-    float calculate_delta()
+    float delta()
     {
         const auto now{std::chrono::high_resolution_clock::now()};
         const std::chrono::duration<float> delta{now - previous_frame};
