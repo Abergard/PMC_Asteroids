@@ -4,7 +4,7 @@
 
 struct Asteroid
 {
-    game_entity game_object;
+    game_entity* game_object;
 
     // TODO: replace by movement component
     float current_speed{1};

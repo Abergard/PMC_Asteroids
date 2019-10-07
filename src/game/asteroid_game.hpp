@@ -1,24 +1,12 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
-
-#include <windows.h>
-
-#include <chrono>
-#include <cmath>
-#include <ctime>
-#include <exception>
-#include <functional>
-#include <gl/GLU.h>
-#include <iostream>
-#include <stdlib.h>
 #include <vector>
 
 #include "game/asteroid.hpp"
 #include "game/ship.hpp"
+#include "graphics/opengl_old_pipeline.hpp"
 #include "ui/keyboard.hpp"
-#include "ui/window_win32.hpp"
-#include "world/frame_clock.hpp"
+#include "ui/window.hpp"
 
 class asteroid_game
 {
@@ -31,14 +19,16 @@ public:
 
 private:
     void render_game();
-    void update_game_logic(float delta);
-    void play_death_animation(Ship&, float delta);
+    void update_game_logic(double delta);
+    void play_death_animation(Ship&, double delta);
+    void update_positions();
+
+    const std::size_t number_of_game_objects{2};
 
     float asteroidBuffer = 0;
     std::vector<component::transform> transforms{};
     std::vector<component::direction> directions{};
-    std::vector<component::color> colors{};
-    std::vector<component::mesh> meshs{};
+    std::vector<game_entity> game_objects{};
 
     Ship racket{};
     bool ship_destroyed{false};
@@ -46,8 +36,10 @@ private:
     float ship_slower{0}; // TODO: what the slower is?
 
     Asteroid asteroid{};
-    bool asteroid_visible{false};
 
     ui::window& window;
     ui::keyboard& keyboard;
+
+    graphics::opengl_old_pipeline game_rendering_pipeline{
+        number_of_game_objects};
 };

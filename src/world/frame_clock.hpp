@@ -7,7 +7,7 @@ namespace world
 class frame_clock
 {
 public:
-    float delta()
+    double delta()
     {
         const auto now{std::chrono::high_resolution_clock::now()};
         const std::chrono::duration<float> delta{now - previous_frame};
