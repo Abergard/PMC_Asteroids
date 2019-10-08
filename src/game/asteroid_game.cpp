@@ -18,41 +18,55 @@
 static void rand_asteroid_properties(Asteroid& asteroid)
 {
     int site = rand() % 2800;
+    int alfa = 0;
 
     auto& t = *asteroid.game_object->get<component::transform>();
+    auto& d = *asteroid.game_object->get<component::direction>();
 
     if (site < 800)
     {
         t.location_x = static_cast<float>(site - 400);
         t.location_y = 300 + 50;
         t.rotation = static_cast<float>(rand() % 180 + 180);
+        alfa = rand() % 180 + 180;
     }
     else if (site < 1400)
     {
         t.location_x = 400 + 50;
         t.location_y = static_cast<float>(site - 1100);
         t.rotation = static_cast<float>(rand() % 180 + 90);
+        alfa = rand() % 180 + 90;
     }
     else if (site < 2200)
     {
         t.location_x = static_cast<float>(site - 1800);
         t.location_y = -300 - 50;
         t.rotation = static_cast<float>(rand() % 180);
+        alfa = rand() % 180;
     }
     else
     {
         t.location_x = -400 - 50;
         t.location_y = static_cast<float>(site - 2500);
         t.rotation = static_cast<float>(rand() % 180 - 90);
+        alfa = rand() % 180 - 90;
     }
+
+    d.direction_x = cos(alfa * M_PI / 180.0f);
+    d.direction_y = sin(alfa * M_PI / 180.0f);
+
     asteroid.current_speed =
         static_cast<float>(Asteroid::base_speed * (rand() % 3 + 1));
 }
 
 static Asteroid create_asteroid(std::vector<game_entity>& game_objects,
                                 component::transform& asteroid_transform,
+                                component::direction& asteroid_direction,
                                 component::rendering_target& asteroid_renderer)
 {
+    asteroid_direction.is_forward = component::direction::forward{true};
+    asteroid_direction.direction_x = 1;
+    asteroid_direction.direction_y = -1;
     asteroid_renderer.is_visible = true;
     asteroid_renderer.rgb = 1.0f;
     asteroid_renderer.lines = {{+50.0f, -10.0f},
@@ -69,7 +83,8 @@ static Asteroid create_asteroid(std::vector<game_entity>& game_objects,
     asteroid_renderer.points = {{0.0f, 0.0f}};
 
     Asteroid asteroid{};
-    game_objects.push_back(game_entity{asteroid_transform, asteroid_renderer});
+    game_objects.push_back(game_entity{
+        asteroid_transform, asteroid_renderer, asteroid_direction});
     asteroid.game_object = &game_objects.back();
 
     return asteroid;
@@ -82,6 +97,8 @@ static Ship create_racket(std::vector<game_entity>& game_objects,
                           keyboard_control_system& player_controller)
 {
     racket_direction.is_forward = component::direction::forward{true};
+    racket_direction.direction_x = 0;
+    racket_direction.direction_y = 0;
     racket_renderer.is_visible = true;
     racket_renderer.rgb = 1.0f;
     racket_renderer.lines = {
@@ -118,6 +135,7 @@ asteroid_game::asteroid_game(ui::window& w, ui::keyboard& k)
     asteroid =
         create_asteroid(game_objects,
                         transforms.emplace_back(),
+                        directions.emplace_back(),
                         game_rendering_pipeline.create_rendering_target());
     rand_asteroid_properties(asteroid);
 }
@@ -188,22 +206,22 @@ static bool is_object_inside_screen(const game_entity& game_object)
     return true;
 }
 
-static void move_object(component::transform& racet_local_transform,
+static void move_object(component::transform& local_transform,
+                        component::direction& object_direction,
                         const int move_speed,
                         const int rotation_speed,
                         const double delta)
 {
-    racet_local_transform.location_x +=
-        cos(racet_local_transform.rotation * M_PI / 180.0f) * move_speed *
-        delta;
-    racet_local_transform.location_y +=
-        sin(racet_local_transform.rotation * M_PI / 180.0f) * move_speed *
-        delta;
+    local_transform.location_x +=
+        object_direction.direction_x * move_speed * delta;
 
-    racet_local_transform.rotation += rotation_speed * delta;
+    local_transform.location_y +=
+        object_direction.direction_y * move_speed * delta;
 
-    if (racet_local_transform.rotation > 360.0f)
-        racet_local_transform.rotation -= 360.0f;
+    local_transform.rotation += rotation_speed * delta;
+
+    if (local_transform.rotation > 360.0f)
+        local_transform.rotation -= 360.0f;
 }
 
 void asteroid_game::play_death_animation(Ship& ship, const double delta)
@@ -250,7 +268,8 @@ void asteroid_game::update_game_logic(double delta)
 
     int racket_move_speed = 0;
     int racket_rotation_speed = 0;
-    int asteroid_rotation_speed = 0;
+
+    
 
     // health system
     if (ship_destroyed)
@@ -265,28 +284,46 @@ void asteroid_game::update_game_logic(double delta)
                 Ship::backward_speed;
     }
 
+    auto& racket_transform = *racket.game_object->get<component::transform>();
+    auto& racket_direction = *racket.game_object->get<component::direction>();
+
+    racket_direction.direction_x =
+        cos(racket_transform.rotation * M_PI / 180.0f);
+    racket_direction.direction_y =
+        sin(racket_transform.rotation * M_PI / 180.0f);
+
     // movement system
-    move_object(*racket.game_object->get<component::transform>(),
+    move_object(racket_transform,
+                racket_direction,
                 racket_move_speed,
                 racket_rotation_speed,
                 delta);
 
-    move_object(*asteroid.game_object->get<component::transform>(),
+    auto& asteroid_transform = *asteroid.game_object->get<component::transform>();
+
+    auto rotation = asteroid_transform.rotation;
+    int asteroid_rotation_speed = 100;
+
+    if(rotation < 0)
+        asteroid_rotation_speed *= -1;
+
+    move_object(asteroid_transform,
+                *asteroid.game_object->get<component::direction>(),
                 asteroid.current_speed,
                 asteroid_rotation_speed,
                 delta);
 
     // level logic
-    auto& racet_local_transform =
+    auto& racket_local_transform =
         *racket.game_object->get<component::transform>();
 
-    if (racet_local_transform.location_x > 400 ||
-        racet_local_transform.location_x < -400)
-        racet_local_transform.location_x *= -1;
+    if (racket_local_transform.location_x > 400 ||
+        racket_local_transform.location_x < -400)
+        racket_local_transform.location_x *= -1;
 
-    if (racet_local_transform.location_y > 300 ||
-        racet_local_transform.location_y < -300)
-        racet_local_transform.location_y *= -1;
+    if (racket_local_transform.location_y > 300 ||
+        racket_local_transform.location_y < -300)
+        racket_local_transform.location_y *= -1;
 
     if (!is_object_inside_screen(*asteroid.game_object))
     {
