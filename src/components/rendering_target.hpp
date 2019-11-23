@@ -7,10 +7,22 @@ namespace component
 struct rendering_target
 {
     bool is_visible;
-    float location_x;
-    float location_y;
+
+    struct
+    {
+        float x;
+        float y;
+    } position;
+
     float rotation;
-    float rgb;
+
+    struct
+    {
+        float r;
+        float g;
+        float b;
+    }color;
+
     std::vector<std::pair<float, float>> lines;
     std::vector<std::pair<float, float>> points;
 };

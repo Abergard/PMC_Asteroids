@@ -21,10 +21,10 @@ static void render_object(const component::rendering_target& renderer)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPushMatrix();
 
-    glTranslatef(renderer.location_x, renderer.location_y, 0);
+    glTranslatef(renderer.position.x, renderer.position.y, 0);
     glRotatef(renderer.rotation, 0, 0, 1);
 
-    glColor3f(renderer.rgb, renderer.rgb, renderer.rgb);
+    glColor3f(renderer.color.r, renderer.color.g, renderer.color.b);
 
     glBegin(GL_POLYGON);
     for (const auto& line : renderer.lines)

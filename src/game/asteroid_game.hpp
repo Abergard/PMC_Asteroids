@@ -26,7 +26,6 @@ private:
 
     const std::size_t number_of_game_objects{2};
 
-    float asteroidBuffer = 0;
     std::vector<component::transform> transforms{};
     std::vector<component::direction> directions{};
     std::vector<game_entity> game_objects{};
@@ -34,7 +33,6 @@ private:
     Ship racket{};
     bool ship_destroyed{false};
     int ship_deaths{0};
-    float ship_slower{0}; // TODO: what the slower is?
 
     Asteroid asteroid{};
 

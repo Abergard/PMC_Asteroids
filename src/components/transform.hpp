@@ -4,8 +4,11 @@ namespace component
 {
 struct transform
 {
-    float location_x;
-    float location_y;
+    struct
+    {
+        float x;
+        float y;
+    } position;
     float rotation;
 };
 }

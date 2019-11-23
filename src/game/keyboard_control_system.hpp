@@ -37,17 +37,19 @@ public:
 
     void on_key_pressed(const ui::keyboard_key key)
     {
+        //FIXME; temporary paste from ship
+        const float rotation_step = 2.0f;
         for (auto* player : entities)
         {
             switch (key)
             {
             case ui::keyboard_key::left:
                 rotate_left(*player->get<component::transform>(),
-                            Ship::rotation_step);
+                            rotation_step);
                 break;
             case ui::keyboard_key::right:
                 rotate_right(*player->get<component::transform>(),
-                             Ship::rotation_step);
+                             rotation_step);
                 break;
 
             case ui::keyboard_key::up:
